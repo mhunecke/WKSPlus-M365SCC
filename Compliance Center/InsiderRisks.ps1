@@ -23,7 +23,6 @@
 
 .Version
     3.20 (May 27th 2022)
-
 #>
 
 Param (
@@ -322,7 +321,7 @@ function InsiderRisks_CreateAzureApp
             $appExists = Get-AzureADApplication -SearchString "HRConnector"
             $AzureTenantID = Get-AzureADTenantDetail
             $global:tenantid = $AzureTenantID.ObjectId
-            if ($appExists -eq $null)
+            if ($null -eq $appExists)
                 {
                     $AzureADAppReg = New-AzureADApplication -DisplayName HRConnector -AvailableToOtherTenants $false -ErrorAction Stop
                     $appname = $AzureADAppReg.DisplayName
