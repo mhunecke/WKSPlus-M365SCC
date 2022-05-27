@@ -20,6 +20,10 @@
     # or other pecuniary loss) arising out of the use of or inability to use the sample script or    #
     # documentation, even if Microsoft has been advised of the possibility of such damages.          #
     ##################################################################################################
+
+.Version
+    3.20 (May 27th 2022)
+
 #>
 
 Param (
