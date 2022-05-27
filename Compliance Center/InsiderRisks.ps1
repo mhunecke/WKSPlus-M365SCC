@@ -518,3 +518,4 @@ if($nextPhase -eq 7)
         logWrite 7 $true "Configuration completed"
         exitScript
     }
+    
