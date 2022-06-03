@@ -22,7 +22,7 @@
     ##################################################################################################
 
 .Version
-    3.27 (Jun 2nd 2022)
+    3.27 (June 3rd, 2022)
 #>
 
 Param (
@@ -430,9 +430,9 @@ $global:Recovery = $false
 $oldDebugPreference = $DebugPreference
 if($debug)
 {
-    write-debug "Debug Enabled"
+    Write-debug "Debug Enabled"
     $DebugPreference = "Continue"
-   Start-Transcript -Path "$($LogPath)download-debug.txt"
+    Start-Transcript -Path "$($LogPath)download-debug.txt"
 }
 
 if(!(Test-Path($logCSV)))
