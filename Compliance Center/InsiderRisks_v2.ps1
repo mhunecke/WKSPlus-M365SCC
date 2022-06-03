@@ -250,53 +250,16 @@ function InsiderRisks_CreateCSVFile
     try 
         {
             $global:HRConnectorCSVFile = "$($LogPath)HRConnector.csv"
-            "HRScenarios,EmailAddress,ResignationDate,LastWorkingDate,EffectiveDate,YearsOnLevel,OldLevel,NewLevel,PerformanceRemarks,PerformanceRating,ImprovementRemarks,ImprovementRating" | out-file $HRConnectorCSVFile -Encoding utf8
+            "HRScenarios,EmailAddress,ResignationDate,LastWorkingDate" | out-file $HRConnectorCSVFile -Encoding utf8
             $Users = Get-AzureADuser | where-object {$null -ne $_.AssignedLicenses} | Select-Object UserPrincipalName -ErrorAction Stop
-
             foreach ($User in $Users)
                 {
                     $EmailAddress = $User.UserPrincipalName
-                    #Resignation block
                     $RandResignationDate  = Get-Random -Minimum 20 -Maximum 30
                     $ResignationDate = (Get-Date).AddDays(-$RandResignationDate).ToString("yyyy-MM-ddTH:mm:ssZ")
                     $RandLastWorkingDate = Get-Random -Minimum 10 -Maximum 20
                     $LastWorkingDate = (Get-Date).AddDays(-$RandLastWorkingDate).ToString("yyyy-MM-ddTH:mm:ssZ")
-                    #$RandEffectiveDate = Get-Random -Minimum 365 -Maximum 1000
-                    #$EffectiveDate = (Get-Date).AddDays(-$RandEffectiveDate).ToString("yyyy-MM-ddTH:mm:ssZ")
-                    #Employee level block
-                    #$YearsOnLevel = Get-Random -Minimum 1 -Maximum 6
-                    #$OldLevel = Get-Random -Minimum 57 -Maximum 64
-                    #$NewLevel = $OldLevel--
-                    #performance and performance review block
-                    #$RandRating = Get-Random -Minimum 1 -Maximum 4
-                    #Switch ($RandRating) 
-                    #    {
-                    #        1 
-                    #            {
-                    #                $PerformanceRemarks = "Achieved all commitments and exceptional results that surpassed expectations"
-                    #                $PerformanceRating = "1 - Exceeded"
-                    #                $ImprovementRemarks = $null
-                    #                $ImprovementRating = $null
-                    #            }
-                    #        2 
-                    #            {
-                    #                $PerformanceRemarks = "Achieved all commitments and expected results"
-                    #                $PerformanceRating = "2 - Achieved"
-                    #                $ImprovementRemarks = "Increase the team collaboration"
-                    #                $ImprovementRating = "1 - Exceeded"
-                    #            }
-                    #        3
-                    #            {
-                    #                $PerformanceRemarks = "Failed to achieve commitments or expected results or both"
-                    #                $PerformanceRating = "3 - Underperformed"
-                    #                $ImprovementRemarks = "Increase overall performance"
-                    #                $ImprovementRating = "2 - Achieved"
-                    #            }
-                    #   }
                     "Resignation,$EmailAddress,$ResignationDate,$LastWorkingDate," | out-file $HRConnectorCSVFile -Encoding utf8 -Append -ErrorAction Stop
-                    #"Job level changes,$EmailAddress,,,$EffectiveDate,$YearsOnLevel,Level $OldLevel,Level $NewLevel" | out-file $HRConnectorCSVFile -Encoding utf8 -Append -ErrorAction Stop
-                    #"Performance review,$EmailAddress,,,$EffectiveDate,,,,$PerformanceRemarks,$PerformanceRating" | out-file $HRConnectorCSVFile -Encoding utf8 -Append -ErrorAction Stop
-                    #"Performance improvement plan,$EmailAddress,,,$EffectiveDate,,,,,,$ImprovementRemarks,$ImprovementRating,"  | out-file $HRConnectorCSVFile -Encoding utf8 -Append -ErrorAction Stop
                 }
         }
         catch 
