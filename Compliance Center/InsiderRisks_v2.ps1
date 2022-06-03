@@ -356,7 +356,12 @@ function InsiderRisks_CreateAzureApp
                     {
                         $appname = $appExists.DisplayName
                         $global:appid = $appExists.AppId
-                        $Secretfile = Import-Csv _appsecret.txt -Encoding utf8 -ErrorAction Stop
+                        $Secretfile = Import-Csv _appsecret.txt -Encoding utf8 -ErrorAction SilentlyContinue
+                        if ($null -eq $Secretfile)
+                            {
+                                Remove-AzureADApplication -ObjectId $appExists.ObjectId
+                                InsiderRisks_CreateAzureApp
+                            }
                         $global:Secret = $Secretfile.Secret
                         write-host
                         write-host "##########################################################################################" -ForegroundColor Green
