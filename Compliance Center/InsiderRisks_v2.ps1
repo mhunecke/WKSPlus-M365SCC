@@ -225,7 +225,7 @@ function DownloadScripts
             #ref.:https://docs.microsoft.com/en-us/microsoft-365/compliance/import-hr-data?view=o365-worldwide#step-4-run-the-sample-script-to-upload-your-hr-data
             write-Debug "Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile $($LogPath)upload_termination_records.ps1 -ErrorAction Stop"
             Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile "$($LogPath)upload_termination_records.ps1" -ErrorAction Stop
-            $global:Recovery = $false #There no Recover process from here. All the steps below will be executed.
+            $global:Recovery = $false #There no Recover process from here. All the steps below (3, 4, and 5) will be executed.
         } 
         catch 
             {
@@ -259,7 +259,7 @@ function InsiderRisks_CreateCSVFile
                     $ResignationDate = (Get-Date).AddDays(-$RandResignationDate).ToString("yyyy-MM-ddTH:mm:ssZ")
                     $RandLastWorkingDate = Get-Random -Minimum 10 -Maximum 20
                     $LastWorkingDate = (Get-Date).AddDays(-$RandLastWorkingDate).ToString("yyyy-MM-ddTH:mm:ssZ")
-                    "Resignation,$EmailAddress,$ResignationDate,$LastWorkingDate," | out-file $HRConnectorCSVFile -Encoding utf8 -Append -ErrorAction Stop
+                    "Resignation,$EmailAddress,$ResignationDate,$LastWorkingDate" | out-file $HRConnectorCSVFile -Encoding utf8 -Append -ErrorAction Stop
                 }
         }
         catch 
