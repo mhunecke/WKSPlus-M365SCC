@@ -365,7 +365,8 @@ function InsiderRisks_CreateAzureApp
                                 {
                                     Remove-AzureADApplication -ObjectId $appExists.ObjectId
                                     lastEntryPhase = 2
-                                    InsiderRisks_CreateAzureApp
+                                    logWrite 5 $false "Azure App already exists, but the secret file was not found. Try again."
+                                    #InsiderRisks_CreateAzureApp
                                 }
                         $global:Secret = $Secretfile.Secret
                         write-host
