@@ -390,7 +390,7 @@ function InsiderRisks_CreateAzureApp
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 5 $false "Error creating the Azure App for HR Connector."
+            logWrite 5 $false "Error creating the Azure App for HR Connector. Try again."
             exitScript
         }
     if($global:Recovery -eq $false)
