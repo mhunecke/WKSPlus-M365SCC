@@ -364,6 +364,7 @@ function InsiderRisks_CreateAzureApp
                             else
                                 {
                                     Remove-AzureADApplication -ObjectId $appExists.ObjectId
+                                    lastEntryPhase = 2
                                     InsiderRisks_CreateAzureApp
                                 }
                         $global:Secret = $Secretfile.Secret
