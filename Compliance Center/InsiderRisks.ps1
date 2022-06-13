@@ -31,7 +31,7 @@ Param (
 )
 
 #------------------------------------------------------------
-# Write the log.
+# Write the log
 #------------------------------------------------------------
 function logWrite([int]$phase, [bool]$result, [string]$logstring)
 {
