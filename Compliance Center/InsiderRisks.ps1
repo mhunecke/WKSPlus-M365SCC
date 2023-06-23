@@ -22,7 +22,7 @@
     ##################################################################################################
 
 .Version
-    3.20 (May 27th 2022)
+    4.00 (June 30th 2023)
 #>
 
 Param (
@@ -30,9 +30,9 @@ Param (
     [switch]$debug
 )
 
-#------------------------------------------------------------
+#----------------------------------------------------------------
 # Write the log
-#------------------------------------------------------------
+#----------------------------------------------------------------
 function logWrite([int]$phase, [bool]$result, [string]$logstring)
 {
     if ($result)
@@ -46,9 +46,9 @@ function logWrite([int]$phase, [bool]$result, [string]$logstring)
         }
 }
 
-#------------------------------------------------------------
+#----------------------------------------------------------------
 # Start the Recovery steps
-#------------------------------------------------------------
+#----------------------------------------------------------------
 function Recovery
 {
     Write-host "Starting Recovery..."
@@ -90,9 +90,9 @@ function Recovery
                 }
 }
 
-#--------------------------------------------------------
+#----------------------------------------------------------------
 # Exit function
-#--------------------------------------------------------
+#----------------------------------------------------------------
 function exitScript
 {
     # Get-PSSession | Remove-PSSession
@@ -108,9 +108,9 @@ function exitScript
 #########                   I N I T I A L I Z A T I O N                      ##########
 #######################################################################################
 
-#------------------------------------------------------------
+#----------------------------------------------------------------
 # Test the log path (Step 0)
-#------------------------------------------------------------
+#----------------------------------------------------------------
 function Initialization
 {
     $pathExists = Test-Path($LogPath)
@@ -123,9 +123,9 @@ function Initialization
         logWrite 0 $true "Initialization completed"
 }
 
-#------------------------------------------------------------
+#----------------------------------------------------------------
 # Connect to AzureAD (Step 1)
-#------------------------------------------------------------
+#----------------------------------------------------------------
 function ConnectAzureAD
 {
     try 
@@ -167,9 +167,9 @@ function ConnectAzureAD
     }
 }
 
-#------------------------------------------------------------
+#----------------------------------------------------------------
 # Connect to Microsoft Online (Step 2)
-#------------------------------------------------------------
+#----------------------------------------------------------------
 function ConnectMsol
 {
     try 
@@ -212,19 +212,22 @@ function ConnectMsol
 }
 
 #######################################################################################
-#########                    I N S I D E R     R I S K S                     ##########
+#########             I N S I D E R     R I S K S  - General                 ##########
 #######################################################################################
 
-#--------------------------------------------------------
-# Insider Risks - Download script (Step 3)
-#--------------------------------------------------------
+#----------------------------------------------------------------
+# Insider Risks - Download scripts for Connectors (Step 3)
+#----------------------------------------------------------------
 function DownloadScripts
 {
     try
         {
-            #ref.:https://docs.microsoft.com/en-us/microsoft-365/compliance/import-hr-data?view=o365-worldwide#step-4-run-the-sample-script-to-upload-your-hr-data
+            #Public script for HR Connector
             write-Debug "Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile $($LogPath)upload_termination_records.ps1 -ErrorAction Stop"
             Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile "$($LogPath)upload_termination_records.ps1" -ErrorAction Stop
+            #public script for Badge Connector
+            Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_badge_records.ps1" -ErrorAction Stop
+            write-Debug "Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_badge_records.ps1" -ErrorAction Stop"
             $global:Recovery = $false #There no Recover process from here. All the steps below (3, 4, and 5) will be executed.
         } 
         catch 
@@ -242,10 +245,13 @@ function DownloadScripts
         }
 }       
 
-#--------------------------------------------------------
-# InsiderRisks - Create the CSV file (Step 4)
-#--------------------------------------------------------
-function InsiderRisks_CreateCSVFile
+#######################################################################################
+#########           I N S I D E R     R I S K S  - HR Connector              ##########
+#######################################################################################
+#----------------------------------------------------------------
+# InsiderRisks - Create the CSV file for HR Connector (Step 4)
+#----------------------------------------------------------------
+function InsiderRisks_CreateCSVFile_HRConnector
 {
     try 
         {
@@ -276,10 +282,10 @@ function InsiderRisks_CreateCSVFile
         }
 }
 
-#--------------------------------------------------------
-# InsiderRisks - Create an Azure App (Step 5)
-#--------------------------------------------------------
-function InsiderRisks_CreateAzureApp
+#----------------------------------------------------------------
+# InsiderRisks - Create an Azure App for HR Connector (Step 5)
+#----------------------------------------------------------------
+function InsiderRisks_CreateAzureApp_HRConnector
 {
     try
         {
@@ -296,8 +302,8 @@ function InsiderRisks_CreateAzureApp
                     #$global:tenantid = $AzureTenantID.ObjectId
                     $AzureSecret = New-AzureADApplicationPasswordCredential -CustomKeyIdentifier PrimarySecret -ObjectId $azureADAppReg.ObjectId -EndDate ((Get-Date).AddMonths(6)) -ErrorAction Stop
                     $global:Secret = $AzureSecret.value
-                    "Secret" | out-file _appsecret.txt -Encoding utf8 -ErrorAction Stop
-                    $global:Secret | out-file _appsecret.txt -Encoding utf8 -Append -ErrorAction Stop
+                    "Secret" | out-file _appsecret_HRapp.txt -Encoding utf8 -ErrorAction Stop
+                    $global:Secret | out-file _appsecret_HRapp.txt -Encoding utf8 -Append -ErrorAction Stop
                     write-host
                     write-host "##########################################################################################" -ForegroundColor Green
                     write-host "##                                                                                      ##" -ForegroundColor Green
@@ -319,17 +325,16 @@ function InsiderRisks_CreateAzureApp
                     {
                         $appname = $appExists.DisplayName
                         $global:appid = $appExists.AppId
-                        $SecretFileExists = Test-Path _appsecret.txt
+                        $SecretFileExists = Test-Path _appsecret_HRapp.txt
                         if ($SecretFileExists)
                             {
-                                $Secretfile = Import-Csv _appsecret.txt -Encoding utf8 -ErrorAction SilentlyContinue
+                                $Secretfile = Import-Csv _appsecret_HRapp.txt -Encoding utf8 -ErrorAction SilentlyContinue
                             }
                             else
                                 {
                                     Remove-AzureADApplication -ObjectId $appExists.ObjectId
                                     lastEntryPhase = 2
-                                    logWrite 5 $false "Azure App already exists, but the secret file was not found. Try again."
-                                    #InsiderRisks_CreateAzureApp
+                                    logWrite 5 $false "HR Azure App already exists, but the secret file was not found. Try again."
                                 }
                         $global:Secret = $Secretfile.Secret
                         write-host
@@ -365,10 +370,10 @@ function InsiderRisks_CreateAzureApp
         }
 }
 
-#--------------------------------------------------------
-# InsiderRisks - Upload CSV file (Step 6)
-#--------------------------------------------------------
-function InsiderRisks_UploadCSV
+#----------------------------------------------------------------
+# InsiderRisks - Upload CSV file for HR Connector (Step 6)
+#----------------------------------------------------------------
+function InsiderRisks_UploadCSV_HRConnector
 {
     try   
         {
@@ -412,21 +417,209 @@ function InsiderRisks_UploadCSV
 }
 
 #######################################################################################
+#########         I N S I D E R     R I S K S  - Badge Connector             ##########
+#######################################################################################
+#----------------------------------------------------------------
+# InsiderRisks - Create the CSV file for Badge Connector (Step 7)
+#----------------------------------------------------------------
+function InsiderRisks_CreateCSVFile_BadgeConnector
+{
+    try 
+        {
+            $global:BadgeConnectorCSVFile = "$($LogPath)BadgeConnector.csv"
+            "[" | out-file $BadgeConnectorCSVFile -Encoding utf8
+            $Users = Get-AzureADuser | where-object {$null -ne $_.AssignedLicenses} | Select-Object UserPrincipalName -ErrorAction Stop
+            #$BadgeConnectorCSVFile = "C:\Windows\temp\aa.txt"
+            foreach ($User in $Users)
+                {
+                    "{" | out-file $BadgeConnectorCSVFile -Encoding utf8
+                    $EmailAddress = $User.UserPrincipalName
+                    $RandEventTime  = Get-Random -Minimum 1 -Maximum 30
+                    $EventTime = (Get-Date).AddDays(-$RandEventTime).ToString("yyyy-MM-ddTH:mm:ssZ")
+                    $RandAccessStatus  = Get-Random -Minimum 0 -Maximum 1
+                    if ($RandAccessStatus -eq 0)
+                        {
+                            $AccessStatus = "Sucess"
+                        }
+                    else
+                        {
+                            $AccessStatus = "Failed"
+                        }
+                    [char]34 + "UserID" + [char]34 + ":" + $EmailAddress | out-file $BadgeConnectorCSVFile -Encoding utf8
+                    [char]34 + "AssetID" + [char]34 + ":" + [char]34 + "BR-MAIN-01" + [char]34 | out-file $BadgeConnectorCSVFile -Encoding utf8 -Append
+                    [char]34 + "AssetName" + [char]34 + ":" + [char]34 + "Brazilian Office Main Building Door" + [char]34 | out-file $BadgeConnectorCSVFile -Encoding utf8 -Append
+                    [char]34 + "EventTime" + [char]34 + ":" + $EventTime | out-file $BadgeConnectorCSVFile -Encoding utf8
+                    [char]34 + "AccessStatus" + [char]34 + ":" + $AccessStatus | out-file $BadgeConnectorCSVFile -Encoding utf8
+                    "}" | out-file $BadgeConnectorCSVFile -Encoding utf8
+                    "]" | out-file $BadgeConnectorCSVFile -Encoding utf8
+                }
+        }
+        catch 
+        {
+            write-Debug $error[0].Exception
+            logWrite 4 $false "Error creating the BadgeConnector.csv file."
+            exitScript
+        }
+    if($global:Recovery -eq $false)
+        {
+            logWrite 4 $True "Successfully created the BadgeConnector.csv file."
+            $global:nextPhase++
+            Write-Debug "nextPhase set to $global:nextPhase"
+        }
+}
+
+#----------------------------------------------------------------
+# InsiderRisks - Create an Azure App for Badge Connector (Step 8)
+#----------------------------------------------------------------
+function InsiderRisks_CreateAzureApp_BadgeConnector
+{
+    try
+        {
+            $appExists = $null
+            $appExists = Get-AzureADApplication -SearchString "BadgeConnector"
+            $AzureTenantID = Get-AzureADTenantDetail
+            $global:tenantid = $AzureTenantID.ObjectId
+            if ($null -eq $appExists)
+                {
+                    $AzureADAppReg = New-AzureADApplication -DisplayName BadgeConnector -AvailableToOtherTenants $false -ErrorAction Stop
+                    $appname = $AzureADAppReg.DisplayName
+                    $global:appid = $AzureADAppReg.AppID
+                    #$AzureTenantID = Get-AzureADTenantDetail
+                    #$global:tenantid = $AzureTenantID.ObjectId
+                    $AzureSecret = New-AzureADApplicationPasswordCredential -CustomKeyIdentifier PrimarySecret -ObjectId $azureADAppReg.ObjectId -EndDate ((Get-Date).AddMonths(6)) -ErrorAction Stop
+                    $global:Secret = $AzureSecret.value
+                    "Secret" | out-file _appsecret_BadgeApp.txt -Encoding utf8 -ErrorAction Stop
+                    $global:Secret | out-file _appsecret_BadgeApp.txt -Encoding utf8 -Append -ErrorAction Stop
+                    write-host
+                    write-host "##########################################################################################" -ForegroundColor Green
+                    write-host "##                                                                                      ##" -ForegroundColor Green
+                    write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
+                    write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
+                    write-host "##                                                                                      ##" -ForegroundColor Green            
+                    write-host "##   App name  : $appname                                                            ##" -ForegroundColor Green
+                    write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
+                    write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
+                    write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
+                    write-host "##                                                                                      ##" -ForegroundColor Green
+                    write-host "##########################################################################################" -ForegroundColor Green
+                    write-host
+                    Write-host "Return to the lab instructions" -ForegroundColor Yellow
+                    Write-host "When requested, press ENTER to continue." -ForegroundColor Yellow
+                    write-host
+                }
+                else 
+                    {
+                        $appname = $appExists.DisplayName
+                        $global:appid = $appExists.AppId
+                        $SecretFileExists = Test-Path _appsecret_BadgeApp.txt
+                        if ($SecretFileExists)
+                            {
+                                $Secretfile = Import-Csv _appsecret_BadgeApp.txt -Encoding utf8 -ErrorAction SilentlyContinue
+                            }
+                            else
+                                {
+                                    Remove-AzureADApplication -ObjectId $appExists.ObjectId
+                                    lastEntryPhase = 2
+                                    logWrite 5 $false "Badge Azure App already exists, but the secret file was not found. Try again."
+                                }
+                        $global:Secret = $Secretfile.Secret
+                        write-host
+                        write-host "##########################################################################################" -ForegroundColor Green
+                        write-host "##                                                                                      ##" -ForegroundColor Green
+                        write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
+                        write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
+                        write-host "##                                                                                      ##" -ForegroundColor Green            
+                        write-host "##   App name  : $appname                                                            ##" -ForegroundColor Green
+                        write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
+                        write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
+                        write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
+                        write-host "##                                                                                      ##" -ForegroundColor Green
+                        write-host "##########################################################################################" -ForegroundColor Green
+                        write-host
+                        Write-host "Return to the lab instructions" -ForegroundColor Yellow
+                        Write-host "When requested, press ENTER to continue." -ForegroundColor Yellow
+                        write-host
+                        logWrite 5 $True "Azure App for HR Connector already exists, so this step was skipped."
+                    }
+        }
+        catch 
+        {
+            write-Debug $error[0].Exception
+            logWrite 5 $false "Error creating the Azure App for Badge Connector. Try again."
+            exitScript
+        }
+    if($global:Recovery -eq $false)
+        {
+            logWrite 5 $True "Successfully created the Azure App for Bagde Connector."
+            $global:nextPhase++
+            Write-Debug "nextPhase set to $global:nextPhase"
+        }
+}
+
+#----------------------------------------------------------------
+# InsiderRisks - Upload CSV file for Badge Connector (Step 9)
+#----------------------------------------------------------------
+function InsiderRisks_UploadCSV_BadgeConnector
+{
+    try   
+        {
+            Write-Host
+            $ConnectorJobID = Read-Host "Paste the Connector job ID"
+            if ($null -eq $ConnectorJobID)
+                {
+                    $ConnectorJobID = Read-Host "Paste the Connector job ID"
+                }
+            "JobID" | out-file _jobID.txt -Encoding utf8 -ErrorAction Stop
+            $ConnectorJobID | out-file _jobID.txt -Encoding utf8 -Append -ErrorAction Stop
+            Write-Host
+            write-host "##########################################################################################" -ForegroundColor Green
+            write-host "##                                                                                      ##" -ForegroundColor Green
+            write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
+            write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
+            write-host "##                                                                                      ##" -ForegroundColor Green            
+            write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
+            write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
+            write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
+            write-host "##   JobId     : $ConnectorJobID                                   ##" -ForegroundColor Green
+            write-host "##   CSV File  : $global:BadgeConnectorCSVFile   ##" -ForegroundColor Green
+            write-host "##                                                                                      ##" -ForegroundColor Green
+            write-host "##########################################################################################" -ForegroundColor Green
+            Write-Host
+            Set-Location -Path "$env:UserProfile\Desktop\SCLabFiles\Scripts"
+            .\upload_termination_records.ps1 -tenantId $tenantId -appId $appId -appSecret $Secret -jobId $ConnectorJobID -FilePath $BadgeConnectorCSVFile
+        }
+        catch 
+        {
+            write-Debug $error[0].Exception
+            logWrite 6 $false "Error uploading the BadgeConnector.csv file"
+            exitScript
+        }
+    if($global:Recovery -eq $false)
+        {
+            logWrite 6 $True "Successfully uploading the BadgeConnector.csv file."
+            $global:nextPhase++
+            Write-Debug "nextPhase set to $global:nextPhase"
+        }
+}
+
+
+
+#######################################################################################
 #########            S C R I P T    S T A R T S   H E R E                    ##########
 #######################################################################################
 
-#--------------------------------------------------------
+#----------------------------------------------------------------
 # Variable definition - General
-#--------------------------------------------------------
+#----------------------------------------------------------------
 $LogPath = "$env:UserProfile\Desktop\SCLabFiles\Scripts\"
 $LogCSV = "$env:UserProfile\Desktop\SCLabFiles\Scripts\InsiderRisks_Log.csv"
 $global:nextPhase = 1
 $global:Recovery = $false
 #Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
 
-#------------------------------------------------------------
+#--------------------------------------------------------------------
 # Debug mode
-#------------------------------------------------------------
+#--------------------------------------------------------------------
 $oldDebugPreference = $DebugPreference
 if($debug)
 {
@@ -448,9 +641,9 @@ if(!(Test-Path($logCSV)))
                 Recovery
             }
 
-#--------------------------------------------------------
+#----------------------------------------------------------------
 # use variable to control phases
-#--------------------------------------------------------
+#----------------------------------------------------------------
 if($nextPhase -eq 1)
     {
         write-debug "Phase $nextPhase"
@@ -472,23 +665,42 @@ if($nextPhase -eq 3)
 if($nextPhase -eq 4)
     {
         write-debug "Phase $nextPhase"
-        InsiderRisks_CreateCSVFile
+        InsiderRisks_CreateCSVFile_HRConnector
     }
 
 if($nextPhase -eq 5)
     {
         write-debug "Phase $nextPhase"
-        InsiderRisks_CreateAzureApp
+        InsiderRisks_CreateAzureApp_HRConnector
         $answer = Read-Host "Press ENTER to continue"
     }
 
 if($nextPhase -eq 6)
     {
         write-debug "Phase $nextPhase"
-        InsiderRisks_UploadCSV
+        InsiderRisks_UploadCSV_HRConnector
     }
 
 if($nextPhase -eq 7)
+    {
+        write-debug "Phase $nextPhase"
+        InsiderRisks_CreateCSVFile_BadgeConnector
+    }
+
+if($nextPhase -eq 8)
+    {
+        write-debug "Phase $nextPhase"
+        InsiderRisks_CreateAzureApp_BadgeConnector
+        $answer = Read-Host "Press ENTER to continue"
+    }
+
+if($nextPhase -eq 9)
+    {
+        write-debug "Phase $nextPhase"
+        InsiderRisks_UploadCSV_BadgeConnector
+    }
+
+if($nextPhase -eq 10)
     {
         write-debug "Phase $nextPhase"
         write-host "Configuration completed"
