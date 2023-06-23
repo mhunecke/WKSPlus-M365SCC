@@ -225,9 +225,9 @@ function DownloadScripts
             #Public script for HR Connector
             write-Debug "Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile $($LogPath)upload_termination_records.ps1 -ErrorAction Stop"
             Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile "$($LogPath)upload_termination_records.ps1" -ErrorAction Stop
-            #public script for Badge Connector
-            Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_badge_records.ps1" -ErrorAction Stop
-            write-Debug "Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_badge_records.ps1" -ErrorAction Stop"
+            #public script for Physical Badging Connector
+            Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_Badging_records.ps1" -ErrorAction Stop
+            write-Debug "Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_Badging_records.ps1" -ErrorAction Stop"
             $global:Recovery = $false #There no Recover process from here. All the steps below (3, 4, and 5) will be executed.
         } 
         catch 
@@ -417,22 +417,22 @@ function InsiderRisks_UploadCSV_HRConnector
 }
 
 #######################################################################################
-#########         I N S I D E R     R I S K S  - Badge Connector             ##########
+#########         I N S I D E R     R I S K S  - Physical Badging Connector             ##########
 #######################################################################################
 #----------------------------------------------------------------
-# InsiderRisks - Create the CSV file for Badge Connector (Step 7)
+# InsiderRisks - Create the CSV file for Physical Badging Connector (Step 7)
 #----------------------------------------------------------------
-function InsiderRisks_CreateCSVFile_BadgeConnector
+function InsiderRisks_CreateCSVFile_BadgingConnector
 {
     try 
         {
-            $global:BadgeConnectorCSVFile = "$($LogPath)BadgeConnector.csv"
-            "[" | out-file $BadgeConnectorCSVFile -Encoding utf8
+            $global:BadgingConnectorCSVFile = "$($LogPath)BadgingConnector.csv"
+            "[" | out-file $BadgingConnectorCSVFile -Encoding utf8
             $Users = Get-AzureADuser | where-object {$null -ne $_.AssignedLicenses} | Select-Object UserPrincipalName -ErrorAction Stop
-            #$BadgeConnectorCSVFile = "C:\Windows\temp\aa.txt"
+            #$BadgingConnectorCSVFile = "C:\Windows\temp\aa.txt"
             foreach ($User in $Users)
                 {
-                    "{" | out-file $BadgeConnectorCSVFile -Encoding utf8
+                    "{" | out-file $BadgingConnectorCSVFile -Encoding utf8
                     $EmailAddress = $User.UserPrincipalName
                     $RandEventTime  = Get-Random -Minimum 1 -Maximum 30
                     $EventTime = (Get-Date).AddDays(-$RandEventTime).ToString("yyyy-MM-ddTH:mm:ssZ")
@@ -445,51 +445,51 @@ function InsiderRisks_CreateCSVFile_BadgeConnector
                         {
                             $AccessStatus = "Failed"
                         }
-                    [char]34 + "UserID" + [char]34 + ":" + $EmailAddress | out-file $BadgeConnectorCSVFile -Encoding utf8
-                    [char]34 + "AssetID" + [char]34 + ":" + [char]34 + "BR-MAIN-01" + [char]34 | out-file $BadgeConnectorCSVFile -Encoding utf8 -Append
-                    [char]34 + "AssetName" + [char]34 + ":" + [char]34 + "Brazilian Office Main Building Door" + [char]34 | out-file $BadgeConnectorCSVFile -Encoding utf8 -Append
-                    [char]34 + "EventTime" + [char]34 + ":" + $EventTime | out-file $BadgeConnectorCSVFile -Encoding utf8
-                    [char]34 + "AccessStatus" + [char]34 + ":" + $AccessStatus | out-file $BadgeConnectorCSVFile -Encoding utf8
-                    "}" | out-file $BadgeConnectorCSVFile -Encoding utf8
-                    "]" | out-file $BadgeConnectorCSVFile -Encoding utf8
+                    [char]34 + "UserID" + [char]34 + ":" + $EmailAddress | out-file $BadgingConnectorCSVFile -Encoding utf8
+                    [char]34 + "AssetID" + [char]34 + ":" + [char]34 + "BR-MAIN-01" + [char]34 | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    [char]34 + "AssetName" + [char]34 + ":" + [char]34 + "Brazilian Office Main Building Door" + [char]34 | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    [char]34 + "EventTime" + [char]34 + ":" + $EventTime | out-file $BadgingConnectorCSVFile -Encoding utf8
+                    [char]34 + "AccessStatus" + [char]34 + ":" + $AccessStatus | out-file $BadgingConnectorCSVFile -Encoding utf8
+                    "}" | out-file $BadgingConnectorCSVFile -Encoding utf8
+                    "]" | out-file $BadgingConnectorCSVFile -Encoding utf8
                 }
         }
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 4 $false "Error creating the BadgeConnector.csv file."
+            logWrite 4 $false "Error creating the BadgingConnector.csv file."
             exitScript
         }
     if($global:Recovery -eq $false)
         {
-            logWrite 4 $True "Successfully created the BadgeConnector.csv file."
+            logWrite 4 $True "Successfully created the BadgingConnector.csv file."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
 }
 
 #----------------------------------------------------------------
-# InsiderRisks - Create an Azure App for Badge Connector (Step 8)
+# InsiderRisks - Create an Azure App for Physical Badging Connector (Step 8)
 #----------------------------------------------------------------
-function InsiderRisks_CreateAzureApp_BadgeConnector
+function InsiderRisks_CreateAzureApp_BadgingConnector
 {
     try
         {
             $appExists = $null
-            $appExists = Get-AzureADApplication -SearchString "BadgeConnector"
+            $appExists = Get-AzureADApplication -SearchString "BadgingConnector"
             $AzureTenantID = Get-AzureADTenantDetail
             $global:tenantid = $AzureTenantID.ObjectId
             if ($null -eq $appExists)
                 {
-                    $AzureADAppReg = New-AzureADApplication -DisplayName BadgeConnector -AvailableToOtherTenants $false -ErrorAction Stop
+                    $AzureADAppReg = New-AzureADApplication -DisplayName BadgingConnector -AvailableToOtherTenants $false -ErrorAction Stop
                     $appname = $AzureADAppReg.DisplayName
                     $global:appid = $AzureADAppReg.AppID
                     #$AzureTenantID = Get-AzureADTenantDetail
                     #$global:tenantid = $AzureTenantID.ObjectId
                     $AzureSecret = New-AzureADApplicationPasswordCredential -CustomKeyIdentifier PrimarySecret -ObjectId $azureADAppReg.ObjectId -EndDate ((Get-Date).AddMonths(6)) -ErrorAction Stop
                     $global:Secret = $AzureSecret.value
-                    "Secret" | out-file _appsecret_BadgeApp.txt -Encoding utf8 -ErrorAction Stop
-                    $global:Secret | out-file _appsecret_BadgeApp.txt -Encoding utf8 -Append -ErrorAction Stop
+                    "Secret" | out-file _appsecret_BadgingApp.txt -Encoding utf8 -ErrorAction Stop
+                    $global:Secret | out-file _appsecret_BadgingApp.txt -Encoding utf8 -Append -ErrorAction Stop
                     write-host
                     write-host "##########################################################################################" -ForegroundColor Green
                     write-host "##                                                                                      ##" -ForegroundColor Green
@@ -511,16 +511,16 @@ function InsiderRisks_CreateAzureApp_BadgeConnector
                     {
                         $appname = $appExists.DisplayName
                         $global:appid = $appExists.AppId
-                        $SecretFileExists = Test-Path _appsecret_BadgeApp.txt
+                        $SecretFileExists = Test-Path _appsecret_BadgingApp.txt
                         if ($SecretFileExists)
                             {
-                                $Secretfile = Import-Csv _appsecret_BadgeApp.txt -Encoding utf8 -ErrorAction SilentlyContinue
+                                $Secretfile = Import-Csv _appsecret_BadgingApp.txt -Encoding utf8 -ErrorAction SilentlyContinue
                             }
                             else
                                 {
                                     Remove-AzureADApplication -ObjectId $appExists.ObjectId
                                     lastEntryPhase = 2
-                                    logWrite 5 $false "Badge Azure App already exists, but the secret file was not found. Try again."
+                                    logWrite 5 $false "Badging Azure App already exists, but the secret file was not found. Try again."
                                 }
                         $global:Secret = $Secretfile.Secret
                         write-host
@@ -545,7 +545,7 @@ function InsiderRisks_CreateAzureApp_BadgeConnector
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 5 $false "Error creating the Azure App for Badge Connector. Try again."
+            logWrite 5 $false "Error creating the Azure App for Physical Badging Connector. Try again."
             exitScript
         }
     if($global:Recovery -eq $false)
@@ -557,9 +557,9 @@ function InsiderRisks_CreateAzureApp_BadgeConnector
 }
 
 #----------------------------------------------------------------
-# InsiderRisks - Upload CSV file for Badge Connector (Step 9)
+# InsiderRisks - Upload CSV file for Physical Badging Connector (Step 9)
 #----------------------------------------------------------------
-function InsiderRisks_UploadCSV_BadgeConnector
+function InsiderRisks_UploadCSV_BadgingConnector
 {
     try   
         {
@@ -581,27 +581,26 @@ function InsiderRisks_UploadCSV_BadgeConnector
             write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
             write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
             write-host "##   JobId     : $ConnectorJobID                                   ##" -ForegroundColor Green
-            write-host "##   CSV File  : $global:BadgeConnectorCSVFile   ##" -ForegroundColor Green
+            write-host "##   CSV File  : $global:BadgingConnectorCSVFile   ##" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green
             write-host "##########################################################################################" -ForegroundColor Green
             Write-Host
             Set-Location -Path "$env:UserProfile\Desktop\SCLabFiles\Scripts"
-            .\upload_termination_records.ps1 -tenantId $tenantId -appId $appId -appSecret $Secret -jobId $ConnectorJobID -FilePath $BadgeConnectorCSVFile
+            .\upload_Badging_records.ps1 -tenantId $tenantId -appId $appId -appSecret $Secret -jobId $ConnectorJobID -FilePath $BadgingConnectorCSVFile -jsonFilePath "$BadgingConnectorCSVFile"
         }
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 6 $false "Error uploading the BadgeConnector.csv file"
+            logWrite 6 $false "Error uploading the BadgingConnector.csv file"
             exitScript
         }
     if($global:Recovery -eq $false)
         {
-            logWrite 6 $True "Successfully uploading the BadgeConnector.csv file."
+            logWrite 6 $True "Successfully uploading the BadgingConnector.csv file."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
 }
-
 
 
 #######################################################################################
@@ -684,20 +683,20 @@ if($nextPhase -eq 6)
 if($nextPhase -eq 7)
     {
         write-debug "Phase $nextPhase"
-        InsiderRisks_CreateCSVFile_BadgeConnector
+        InsiderRisks_CreateCSVFile_BadgingConnector
     }
 
 if($nextPhase -eq 8)
     {
         write-debug "Phase $nextPhase"
-        InsiderRisks_CreateAzureApp_BadgeConnector
+        InsiderRisks_CreateAzureApp_BadgingConnector
         $answer = Read-Host "Press ENTER to continue"
     }
 
 if($nextPhase -eq 9)
     {
         write-debug "Phase $nextPhase"
-        InsiderRisks_UploadCSV_BadgeConnector
+        InsiderRisks_UploadCSV_BadgingConnector
     }
 
 if($nextPhase -eq 10)
