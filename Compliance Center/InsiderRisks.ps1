@@ -22,7 +22,7 @@
     ##################################################################################################
 
 .Version
-    4.002 (June 27th, 2023)
+    4.003 (June 27th, 2023)
 #>
 
 Param (
@@ -226,7 +226,7 @@ function DownloadScripts
             write-Debug "Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile $($LogPath)upload_termination_records.ps1 -ErrorAction Stop"
             Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile "$($LogPath)upload_termination_records.ps1" -ErrorAction Stop
             #Public script for Physical Badging Connector
-            write-Debug "Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-physical-badging-connector-sample-scripts/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_Badging_records.ps1" -ErrorAction Stop"
+            write-Debug "Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-physical-badging-connector-sample-scripts/master/push_physical_badging_records.ps1 -OutFile $($LogPath)upload_badging_records.ps1 -ErrorAction Stop"
             Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-physical-badging-connector-sample-scripts/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_badging_records.ps1" -ErrorAction Stop
             $global:Recovery = $false #There no Recover process from here. All the steps below (3, 4, and 5) will be executed.
         } 
