@@ -262,9 +262,9 @@ function InsiderRisks_CreateCSVFile_HRConnector
                 {
                     $EmailAddress = $User.UserPrincipalName
                     $RandResignationDate  = Get-Random -Minimum 20 -Maximum 30
-                    $ResignationDate = (Get-Date).AddDays(-$RandResignationDate).ToString("yyyy-MM-ddTH:mm:ssZ")
+                    $ResignationDate = (Get-Date).AddDays(-$RandResignationDate).ToString("yyyy-MM-ddTHH:mm:ssZ")
                     $RandLastWorkingDate = Get-Random -Minimum 10 -Maximum 20
-                    $LastWorkingDate = (Get-Date).AddDays(-$RandLastWorkingDate).ToString("yyyy-MM-ddTH:mm:ssZ")
+                    $LastWorkingDate = (Get-Date).AddDays(-$RandLastWorkingDate).ToString("yyyy-MM-ddTHH:mm:ssZ")
                     "Resignation,$EmailAddress,$ResignationDate,$LastWorkingDate" | out-file $HRConnectorCSVFile -Encoding utf8 -Append -ErrorAction Stop
                 }
         }
