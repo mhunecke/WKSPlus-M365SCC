@@ -22,7 +22,7 @@
     ##################################################################################################
 
 .Version
-    4.003 (June 27th, 2023)
+    4.01 (June 27th, 2023)
 #>
 
 Param (
@@ -255,7 +255,7 @@ function InsiderRisks_CreateCSVFile_HRConnector
 {
     try 
         {
-            $global:HRConnectorCSVFile = "$($LogPath)HRConnector.csv"
+            $global:HRConnectorCSVFile = "$($LogPath)HRConnectorData.csv"
             "HRScenarios,EmailAddress,ResignationDate,LastWorkingDate" | out-file $HRConnectorCSVFile -Encoding utf8
             $Users = Get-AzureADuser | where-object {$null -ne $_.AssignedLicenses} | Select-Object UserPrincipalName -ErrorAction Stop
             foreach ($User in $Users)
@@ -289,6 +289,7 @@ function InsiderRisks_CreateAzureApp_HRConnector
 {
     try
         {
+            $HRapp_appsecret = "$($LogPath)_HRapp_appsecret.txt"
             $appExists = $null
             $appExists = Get-AzureADApplication -SearchString "HRConnector"
             $AzureTenantID = Get-AzureADTenantDetail
@@ -302,8 +303,8 @@ function InsiderRisks_CreateAzureApp_HRConnector
                     #$global:tenantid = $AzureTenantID.ObjectId
                     $AzureSecret = New-AzureADApplicationPasswordCredential -CustomKeyIdentifier PrimarySecret -ObjectId $azureADAppReg.ObjectId -EndDate ((Get-Date).AddMonths(6)) -ErrorAction Stop
                     $global:Secret = $AzureSecret.value
-                    "Secret" | out-file _appsecret_HRapp.txt -Encoding utf8 -ErrorAction Stop
-                    $global:Secret | out-file _appsecret_HRapp.txt -Encoding utf8 -Append -ErrorAction Stop
+                    "Secret" | out-file $HRapp_appsecret -Encoding utf8 -ErrorAction Stop
+                    $global:Secret | out-file $HRapp_appsecret -Encoding utf8 -Append -ErrorAction Stop
                     write-host
                     write-host "##########################################################################################" -ForegroundColor Green
                     write-host "##                                                                                      ##" -ForegroundColor Green
@@ -325,10 +326,10 @@ function InsiderRisks_CreateAzureApp_HRConnector
                     {
                         $appname = $appExists.DisplayName
                         $global:appid = $appExists.AppId
-                        $SecretFileExists = Test-Path _appsecret_HRapp.txt
+                        $SecretFileExists = Test-Path $HRapp_appsecret
                         if ($SecretFileExists)
                             {
-                                $Secretfile = Import-Csv _appsecret_HRapp.txt -Encoding utf8 -ErrorAction SilentlyContinue
+                                $Secretfile = Import-Csv $HRapp_appsecret -Encoding utf8 -ErrorAction SilentlyContinue
                             }
                             else
                                 {
@@ -378,13 +379,14 @@ function InsiderRisks_UploadCSV_HRConnector
     try   
         {
             Write-Host
+            $HRConnector_JobID = "$($LogPath)_$HRConnector_jobID.txt"
             $ConnectorJobID = Read-Host "Paste the Connector job ID"
             if ($null -eq $ConnectorJobID)
                 {
                     $ConnectorJobID = Read-Host "Paste the Connector job ID"
                 }
-            "JobID" | out-file _jobID.txt -Encoding utf8 -ErrorAction Stop
-            $ConnectorJobID | out-file _jobID.txt -Encoding utf8 -Append -ErrorAction Stop
+            "JobID" | out-file $HRConnector_JobID -Encoding utf8 -ErrorAction Stop
+            $ConnectorJobID | out-file $HRConnector_JobID -Encoding utf8 -Append -ErrorAction Stop
             Write-Host
             write-host "##########################################################################################" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green
@@ -426,7 +428,7 @@ function InsiderRisks_CreateCSVFile_BadgingConnector
 {
     try 
         {
-            $global:BadgingConnectorCSVFile = "$($LogPath)BadgingConnector.csv"
+            $global:BadgingConnectorCSVFile = "$($LogPath)BadgingConnectorData.csv"
             "[" | out-file $BadgingConnectorCSVFile -Encoding utf8
             $Users = Get-AzureADuser | where-object {$null -ne $_.AssignedLicenses} | Select-Object UserPrincipalName -ErrorAction Stop
             foreach ($User in $Users)
@@ -474,6 +476,7 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
 {
     try
         {
+            $BadgingApp_appsecret = "$($LogPath)_BadgingApp_appsecret.txt"
             $appExists = $null
             $appExists = Get-AzureADApplication -SearchString "BadgingConnector"
             $AzureTenantID = Get-AzureADTenantDetail
@@ -487,8 +490,8 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                     #$global:tenantid = $AzureTenantID.ObjectId
                     $AzureSecret = New-AzureADApplicationPasswordCredential -CustomKeyIdentifier PrimarySecret -ObjectId $azureADAppReg.ObjectId -EndDate ((Get-Date).AddMonths(6)) -ErrorAction Stop
                     $global:Secret = $AzureSecret.value
-                    "Secret" | out-file _appsecret_BadgingApp.txt -Encoding utf8 -ErrorAction Stop
-                    $global:Secret | out-file _appsecret_BadgingApp.txt -Encoding utf8 -Append -ErrorAction Stop
+                    "Secret" | out-file $BadgingApp_appsecret -Encoding utf8 -ErrorAction Stop
+                    $global:Secret | out-file $BadgingApp_appsecret -Encoding utf8 -Append -ErrorAction Stop
                     write-host
                     write-host "##########################################################################################" -ForegroundColor Green
                     write-host "##                                                                                      ##" -ForegroundColor Green
@@ -510,10 +513,10 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                     {
                         $appname = $appExists.DisplayName
                         $global:appid = $appExists.AppId
-                        $SecretFileExists = Test-Path _appsecret_BadgingApp.txt
+                        $SecretFileExists = Test-Path $BadgingApp_appsecret
                         if ($SecretFileExists)
                             {
-                                $Secretfile = Import-Csv _appsecret_BadgingApp.txt -Encoding utf8 -ErrorAction SilentlyContinue
+                                $Secretfile = Import-Csv $BadgingApp_appsecret -Encoding utf8 -ErrorAction SilentlyContinue
                             }
                             else
                                 {
@@ -563,13 +566,14 @@ function InsiderRisks_UploadCSV_BadgingConnector
     try   
         {
             Write-Host
+            $BadgingConnector_JobID = "$($LogPath)_$BadgingConnector_jobID.txt"
             $ConnectorJobID = Read-Host "Paste the Connector job ID"
             if ($null -eq $ConnectorJobID)
                 {
                     $ConnectorJobID = Read-Host "Paste the Connector job ID"
                 }
-            "JobID" | out-file _jobID.txt -Encoding utf8 -ErrorAction Stop
-            $ConnectorJobID | out-file _jobID.txt -Encoding utf8 -Append -ErrorAction Stop
+            "JobID" | out-file $BadgingConnector_JobID -Encoding utf8 -ErrorAction Stop
+            $ConnectorJobID | out-file $BadgingConnector_JobID -Encoding utf8 -Append -ErrorAction Stop
             Write-Host
             write-host "##########################################################################################" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green
