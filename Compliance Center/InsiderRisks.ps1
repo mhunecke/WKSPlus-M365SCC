@@ -225,8 +225,8 @@ function DownloadScripts
             #Public script for HR Connector
             write-Debug "Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile $($LogPath)upload_termination_records.ps1 -ErrorAction Stop"
             Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile "$($LogPath)upload_termination_records.ps1" -ErrorAction Stop
-            #public script for Physical Badging Connector
-            Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_Badging_records.ps1" -ErrorAction Stop
+            #Public script for Physical Badging Connector
+            Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_badging_records.ps1" -ErrorAction Stop
             write-Debug "Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_Badging_records.ps1" -ErrorAction Stop"
             $global:Recovery = $false #There no Recover process from here. All the steps below (3, 4, and 5) will be executed.
         } 
@@ -429,7 +429,6 @@ function InsiderRisks_CreateCSVFile_BadgingConnector
             $global:BadgingConnectorCSVFile = "$($LogPath)BadgingConnector.csv"
             "[" | out-file $BadgingConnectorCSVFile -Encoding utf8
             $Users = Get-AzureADuser | where-object {$null -ne $_.AssignedLicenses} | Select-Object UserPrincipalName -ErrorAction Stop
-            #$BadgingConnectorCSVFile = "C:\Windows\temp\aa.txt"
             foreach ($User in $Users)
                 {
                     "{" | out-file $BadgingConnectorCSVFile -Encoding utf8
@@ -445,14 +444,14 @@ function InsiderRisks_CreateCSVFile_BadgingConnector
                         {
                             $AccessStatus = "Failed"
                         }
-                    [char]34 + "UserID" + [char]34 + ":" + $EmailAddress | out-file $BadgingConnectorCSVFile -Encoding utf8
+                    [char]34 + "UserID" + [char]34 + ":" + $EmailAddress | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
                     [char]34 + "AssetID" + [char]34 + ":" + [char]34 + "BR-MAIN-01" + [char]34 | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
                     [char]34 + "AssetName" + [char]34 + ":" + [char]34 + "Brazilian Office Main Building Door" + [char]34 | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
-                    [char]34 + "EventTime" + [char]34 + ":" + $EventTime | out-file $BadgingConnectorCSVFile -Encoding utf8
-                    [char]34 + "AccessStatus" + [char]34 + ":" + $AccessStatus | out-file $BadgingConnectorCSVFile -Encoding utf8
-                    "}" | out-file $BadgingConnectorCSVFile -Encoding utf8
-                    "]" | out-file $BadgingConnectorCSVFile -Encoding utf8
+                    [char]34 + "EventTime" + [char]34 + ":" + $EventTime | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    [char]34 + "AccessStatus" + [char]34 + ":" + $AccessStatus | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    "}" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
                 }
+                "]" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
         }
         catch 
         {
