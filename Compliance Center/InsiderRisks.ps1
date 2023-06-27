@@ -226,7 +226,7 @@ function DownloadScripts
             write-Debug "Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile $($LogPath)upload_termination_records.ps1 -ErrorAction Stop"
             Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile "$($LogPath)upload_termination_records.ps1" -ErrorAction Stop
             #Public script for Physical Badging Connector
-            Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_badging_records.ps1" -ErrorAction Stop
+            Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-physical-badging-connector-sample-scripts/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_badging_records.ps1" -ErrorAction Stop
             write-Debug "Invoke-WebRequest -Uri https://github.com/microsoft/m365-physical-badging-connector-sample-scripts/blob/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_Badging_records.ps1" -ErrorAction Stop"
             $global:Recovery = $false #There no Recover process from here. All the steps below (3, 4, and 5) will be executed.
         } 
@@ -431,11 +431,10 @@ function InsiderRisks_CreateCSVFile_BadgingConnector
             $Users = Get-AzureADuser | where-object {$null -ne $_.AssignedLicenses} | Select-Object UserPrincipalName -ErrorAction Stop
             foreach ($User in $Users)
                 {
-                    "{" | out-file $BadgingConnectorCSVFile -Encoding utf8
                     $EmailAddress = $User.UserPrincipalName
-                    $RandEventTime  = Get-Random -Minimum 1 -Maximum 30
-                    $EventTime = (Get-Date).AddDays(-$RandEventTime).ToString("yyyy-MM-ddTH:mm:ssZ")
-                    $RandAccessStatus  = Get-Random -Minimum 0 -Maximum 1
+                    $RandEventTime  = Get-Random -Minimum 1 -Maximum 31
+                    $EventTime = (Get-Date).AddDays(-$RandEventTime).ToString("yyyy-MM-ddTHH:mm:ss")
+                    $RandAccessStatus  = Get-Random -Minimum 0 -Maximum 2
                     if ($RandAccessStatus -eq 0)
                         {
                             $AccessStatus = "Sucess"
@@ -444,12 +443,13 @@ function InsiderRisks_CreateCSVFile_BadgingConnector
                         {
                             $AccessStatus = "Failed"
                         }
-                    [char]34 + "UserID" + [char]34 + ":" + $EmailAddress | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
-                    [char]34 + "AssetID" + [char]34 + ":" + [char]34 + "BR-MAIN-01" + [char]34 | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
-                    [char]34 + "AssetName" + [char]34 + ":" + [char]34 + "Brazilian Office Main Building Door" + [char]34 | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
-                    [char]34 + "EventTime" + [char]34 + ":" + $EventTime | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
-                    [char]34 + "AccessStatus" + [char]34 + ":" + $AccessStatus | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
-                    "}" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    "   {" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    "       " + [char]34 + "UserID" + [char]34 + ":" + [char]34 + $EmailAddress + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    "       " + [char]34 + "AssetID" + [char]34 + ":" + [char]34 + "BR-MAIN-01" + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    "       " + [char]34 + "AssetName" + [char]34 + ":" + [char]34 + "Brazilian Office Main Building Door" + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    "       " + [char]34 + "EventTime" + [char]34 + ":" + [char]34 + $EventTime + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    "       " + [char]34 + "AccessStatus" + [char]34 + ":" + [char]34 + $AccessStatus + [char]34 | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    "   }," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
                 }
                 "]" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
         }
@@ -495,7 +495,7 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                     write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
                     write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
                     write-host "##                                                                                      ##" -ForegroundColor Green            
-                    write-host "##   App name  : $appname                                                            ##" -ForegroundColor Green
+                    write-host "##   App name  : $appname                                                         ##" -ForegroundColor Green
                     write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
                     write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
                     write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
@@ -528,7 +528,7 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                         write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
                         write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
                         write-host "##                                                                                      ##" -ForegroundColor Green            
-                        write-host "##   App name  : $appname                                                            ##" -ForegroundColor Green
+                        write-host "##   App name  : $appname                                                         ##" -ForegroundColor Green
                         write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
                         write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
                         write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
@@ -585,7 +585,7 @@ function InsiderRisks_UploadCSV_BadgingConnector
             write-host "##########################################################################################" -ForegroundColor Green
             Write-Host
             Set-Location -Path "$env:UserProfile\Desktop\SCLabFiles\Scripts"
-            .\upload_Badging_records.ps1 -tenantId $tenantId -appId $appId -appSecret $Secret -jobId $ConnectorJobID -FilePath $BadgingConnectorCSVFile -jsonFilePath "$BadgingConnectorCSVFile"
+            .\upload_Badging_records.ps1 -tenantId $tenantId -appId $appId -appSecret $Secret -jobId $ConnectorJobID -jsonFilePath $BadgingConnectorCSVFile
         }
         catch 
         {
