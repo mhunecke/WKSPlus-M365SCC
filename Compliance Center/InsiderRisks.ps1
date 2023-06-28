@@ -23,6 +23,10 @@
 
 .Version
     4.01 (June 27th, 2023)
+    Melhorias:
+    tirar a virgula do JSON file
+    testar se o HR connector já existe ou se se foi sucesso no log para não fazer novamente quando excutar o Badging connector
+    Tem um erro com o JobID de um dos connectores, ou dos 2.
 #>
 
 Param (
@@ -397,7 +401,7 @@ function InsiderRisks_UploadCSV_HRConnector
             write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
             write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
             write-host "##   JobId     : $ConnectorJobID                                   ##" -ForegroundColor Green
-            write-host "##   CSV File  : $global:HRConnectorCSVFile   ##" -ForegroundColor Green
+            write-host "##   CSV File  : $global:HRConnectorCSVFile        ##" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green
             write-host "##########################################################################################" -ForegroundColor Green
             Write-Host
@@ -407,12 +411,12 @@ function InsiderRisks_UploadCSV_HRConnector
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 6 $false "Error uploading the HRConnector.csv file"
+            logWrite 6 $false "Error uploading the HRConnectorData.csv file"
             exitScript
         }
     if($global:Recovery -eq $false)
         {
-            logWrite 6 $True "Successfully uploading the HRConnector.csv file."
+            logWrite 6 $True "Successfully uploading the HRConnectorData.csv file."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
@@ -498,7 +502,7 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                     write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
                     write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
                     write-host "##                                                                                      ##" -ForegroundColor Green            
-                    write-host "##   App name  : $appname                                                         ##" -ForegroundColor Green
+                    write-host "##   App name  : $appname                                                       ##" -ForegroundColor Green
                     write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
                     write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
                     write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
@@ -531,7 +535,7 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                         write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
                         write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
                         write-host "##                                                                                      ##" -ForegroundColor Green            
-                        write-host "##   App name  : $appname                                                         ##" -ForegroundColor Green
+                        write-host "##   App name  : $appname                                                       ##" -ForegroundColor Green
                         write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
                         write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
                         write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
@@ -584,7 +588,7 @@ function InsiderRisks_UploadCSV_BadgingConnector
             write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
             write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
             write-host "##   JobId     : $ConnectorJobID                                   ##" -ForegroundColor Green
-            write-host "##   CSV File  : $global:BadgingConnectorCSVFile   ##" -ForegroundColor Green
+            write-host "##   CSV File  : $global:BadgingConnectorCSVFile     ##" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green
             write-host "##########################################################################################" -ForegroundColor Green
             Write-Host
