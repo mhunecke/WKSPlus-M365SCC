@@ -22,7 +22,7 @@
     ##################################################################################################
 
 .Version
-    4.01 (June 27th, 2023)
+    4.012 (June 27th, 2023)
     Melhorias:
     tirar a virgula do JSON file
     testar se o HR connector já existe ou se se foi sucesso no log para não fazer novamente quando excutar o Badging connector
@@ -462,12 +462,12 @@ function InsiderRisks_CreateCSVFile_BadgingConnector
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 4 $false "Error creating the BadgingConnector.csv file."
+            logWrite 7 $false "Error creating the BadgingConnector.csv file."
             exitScript
         }
     if($global:Recovery -eq $false)
         {
-            logWrite 4 $True "Successfully created the BadgingConnector.csv file."
+            logWrite 7 $True "Successfully created the BadgingConnector.csv file."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
@@ -551,12 +551,12 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 5 $false "Error creating the Azure App for Physical Badging Connector. Try again."
+            logWrite 8 $false "Error creating the Azure App for Physical Badging Connector. Try again."
             exitScript
         }
     if($global:Recovery -eq $false)
         {
-            logWrite 5 $True "Successfully created the Azure App for Bagde Connector."
+            logWrite 8 $True "Successfully created the Azure App for Bagde Connector."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
@@ -598,12 +598,12 @@ function InsiderRisks_UploadCSV_BadgingConnector
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 6 $false "Error uploading the BadgingConnector.csv file"
+            logWrite 9 $false "Error uploading the BadgingConnector.csv file"
             exitScript
         }
     if($global:Recovery -eq $false)
         {
-            logWrite 6 $True "Successfully uploading the BadgingConnector.csv file."
+            logWrite 9 $True "Successfully uploading the BadgingConnector.csv file."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
