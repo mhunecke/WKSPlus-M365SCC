@@ -22,7 +22,7 @@
     ##################################################################################################
 
 .Version
-    4.012 (June 27th, 2023)
+    4.01 (June 27th, 2023)
     Melhorias:
     tirar a virgula do JSON file
     testar se o HR connector já existe ou se se foi sucesso no log para não fazer novamente quando excutar o Badging connector
