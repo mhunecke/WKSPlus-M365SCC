@@ -22,7 +22,7 @@
     ##################################################################################################
 
 .Version
-    4.01 (June 27th, 2023)
+    4.02 (June 27th, 2023)
     Melhorias:
     tirar a virgula do JSON file
     testar se o HR connector já existe ou se se foi sucesso no log para não fazer novamente quando excutar o Badging connector
@@ -34,9 +34,9 @@ Param (
     [switch]$debug
 )
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # Write the log
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function logWrite([int]$phase, [bool]$result, [string]$logstring)
 {
     if ($result)
@@ -50,9 +50,9 @@ function logWrite([int]$phase, [bool]$result, [string]$logstring)
         }
 }
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # Start the Recovery steps
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function Recovery
 {
     Write-host "Starting Recovery..."
@@ -94,9 +94,9 @@ function Recovery
                 }
 }
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # Exit function
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function exitScript
 {
     # Get-PSSession | Remove-PSSession
@@ -112,9 +112,9 @@ function exitScript
 #########                   I N I T I A L I Z A T I O N                      ##########
 #######################################################################################
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # Test the log path (Step 0)
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function Initialization
 {
     $pathExists = Test-Path($LogPath)
@@ -127,9 +127,9 @@ function Initialization
         logWrite 0 $true "Initialization completed"
 }
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # Connect to AzureAD (Step 1)
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function ConnectAzureAD
 {
     try 
@@ -171,9 +171,9 @@ function ConnectAzureAD
     }
 }
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # Connect to Microsoft Online (Step 2)
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function ConnectMsol
 {
     try 
@@ -219,9 +219,9 @@ function ConnectMsol
 #########             I N S I D E R     R I S K S  - General                 ##########
 #######################################################################################
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # Insider Risks - Download scripts for Connectors (Step 3)
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function DownloadScripts
 {
     try
@@ -249,12 +249,12 @@ function DownloadScripts
         }
 }       
 
-#######################################################################################
-#########           I N S I D E R     R I S K S  - HR Connector              ##########
-#######################################################################################
-#----------------------------------------------------------------
+########################################################################################
+#########           I N S I D E R     R I S K S  -  HR Connector              ##########
+########################################################################################
+#---------------------------------------------------------------------
 # InsiderRisks - Create the CSV file for HR Connector (Step 4)
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function InsiderRisks_CreateCSVFile_HRConnector
 {
     try 
@@ -275,20 +275,20 @@ function InsiderRisks_CreateCSVFile_HRConnector
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 4 $false "Error creating the HRConnector.csv file."
+            logWrite 4 $false "Error creating the HRConnectorData.csv file."
             exitScript
         }
     if($global:Recovery -eq $false)
         {
-            logWrite 4 $True "Successfully created the HRConnector.csv file."
+            logWrite 4 $True "Successfully created the HRConnectordata.csv file."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
 }
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # InsiderRisks - Create an Azure App for HR Connector (Step 5)
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function InsiderRisks_CreateAzureApp_HRConnector
 {
     try
@@ -375,9 +375,9 @@ function InsiderRisks_CreateAzureApp_HRConnector
         }
 }
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # InsiderRisks - Upload CSV file for HR Connector (Step 6)
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function InsiderRisks_UploadCSV_HRConnector
 {
     try   
@@ -422,22 +422,40 @@ function InsiderRisks_UploadCSV_HRConnector
         }
 }
 
-#######################################################################################
-#########         I N S I D E R     R I S K S  - Physical Badging Connector             ##########
-#######################################################################################
-#----------------------------------------------------------------
+#################################################################################################
+#########         I N S I D E R     R I S K S  -  Physical Badging Connector          I##########
+#################################################################################################
+#---------------------------------------------------------------------
 # InsiderRisks - Create the CSV file for Physical Badging Connector (Step 7)
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function InsiderRisks_CreateCSVFile_BadgingConnector
 {
     try 
         {
+            $UsersProcessed = 0
             $global:BadgingConnectorCSVFile = "$($LogPath)BadgingConnectorData.csv"
+            $Priority_physical_assets = "$($LogPath)Priority_physical_assets.csv"
             "[" | out-file $BadgingConnectorCSVFile -Encoding utf8
             $Users = Get-AzureADuser | where-object {$null -ne $_.AssignedLicenses} | Select-Object UserPrincipalName -ErrorAction Stop
+            $UsersCount = $Users.Count
             foreach ($User in $Users)
                 {
+                    $UsersProcessed++
                     $EmailAddress = $User.UserPrincipalName
+                    $RandOffice  = Get-Random -Minimum 0 -Maximum 9
+                    Switch ($RandOffice) 
+                    {
+                        0 {$AssetID = "Tokyo_Main_01";$AssetName = "Tokyo Office - Main Building Door"}
+                        1 {$AssetID = "Delhi_Main_01";$AssetName = "Delhi Office - Main Building Door"}
+                        2 {$AssetID = "Shanghai_Main_01";$AssetName = "Shanghai Office - Main Building Door"}
+                        3 {$AssetID = "SaoPaulo_Main_01";$AssetName = "Sao Paulo Office - Main Building Door"}
+                        4 {$AssetID = "MexicoCity_Main_01";$AssetName = "Mexico City Office - Main Building Door"}
+                        5 {$AssetID = "Dhaka_Main_01";$AssetName = "Dhaka Office - Main Building Door"}
+                        6 {$AssetID = "Cairo_Main_01";$AssetName = "Cairo Office - Main Building Door"}
+                        7 {$AssetID = "Beijing_Main_01";$AssetName = "Beijing Office - Main Building Door"}
+                        8 {$AssetID = "London_Main_01";$AssetName = "London Office - Main Building Door"}
+                        9 {$AssetID = "Seattle_Main_01";$AssetName = "Seattle Office - Main Building Door"}
+                    }
                     $RandEventTime  = Get-Random -Minimum 1 -Maximum 31
                     $EventTime = (Get-Date).AddDays(-$RandEventTime).ToString("yyyy-MM-ddTHH:mm:ss")
                     $RandAccessStatus  = Get-Random -Minimum 0 -Maximum 2
@@ -451,31 +469,52 @@ function InsiderRisks_CreateCSVFile_BadgingConnector
                         }
                     "   {" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
                     "       " + [char]34 + "UserID" + [char]34 + ":" + [char]34 + $EmailAddress + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
-                    "       " + [char]34 + "AssetID" + [char]34 + ":" + [char]34 + "BR-MAIN-01" + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
-                    "       " + [char]34 + "AssetName" + [char]34 + ":" + [char]34 + "Brazilian Office Main Building Door" + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    "       " + [char]34 + "AssetID" + [char]34 + ":" + [char]34 + $AssetID + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    "       " + [char]34 + "AssetName" + [char]34 + ":" + [char]34 + $AssetName + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
                     "       " + [char]34 + "EventTime" + [char]34 + ":" + [char]34 + $EventTime + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
                     "       " + [char]34 + "AccessStatus" + [char]34 + ":" + [char]34 + $AccessStatus + [char]34 | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
-                    "   }," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                    if ($UsersProcessed -eq $UsersCount)
+                        {
+                            "   }" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                        }
+                    else
+                        {
+                            "   }," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                        }
                 }
                 "]" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
         }
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 7 $false "Error creating the BadgingConnector.csv file."
+            logWrite 7 $false "Error creating the BadgingConnectorData.csv file."
             exitScript
         }
+        #---------------------------------------------------------------------
+        # InsiderRisks - Create the CSV file for Priority Physical Assests import
+        #---------------------------------------------------------------------
+        "Asset ID" | Out-File $Priority_physical_assets -Encoding utf8
+        "Tokyo_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+        "Delhi_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+        "Shanghai_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+        "SaoPaulo_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+        "MexicoCity_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+        "Dhaka_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+        "Cairo_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+        "Beijing_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+        "London_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+        "Seattle_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
     if($global:Recovery -eq $false)
         {
-            logWrite 7 $True "Successfully created the BadgingConnector.csv file."
+            logWrite 7 $True "Successfully created the BadgingConnectordata.csv file."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
 }
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # InsiderRisks - Create an Azure App for Physical Badging Connector (Step 8)
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function InsiderRisks_CreateAzureApp_BadgingConnector
 {
     try
@@ -562,9 +601,9 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
         }
 }
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # InsiderRisks - Upload CSV file for Physical Badging Connector (Step 9)
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 function InsiderRisks_UploadCSV_BadgingConnector
 {
     try   
@@ -598,12 +637,12 @@ function InsiderRisks_UploadCSV_BadgingConnector
         catch 
         {
             write-Debug $error[0].Exception
-            logWrite 9 $false "Error uploading the BadgingConnector.csv file"
+            logWrite 9 $false "Error uploading the BadgingConnectorData.csv file"
             exitScript
         }
     if($global:Recovery -eq $false)
         {
-            logWrite 9 $True "Successfully uploading the BadgingConnector.csv file."
+            logWrite 9 $True "Successfully uploading the BadgingConnectordata.csv file."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
@@ -614,18 +653,18 @@ function InsiderRisks_UploadCSV_BadgingConnector
 #########            S C R I P T    S T A R T S   H E R E                    ##########
 #######################################################################################
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # Variable definition - General
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 $LogPath = "$env:UserProfile\Desktop\SCLabFiles\Scripts\"
 $LogCSV = "$env:UserProfile\Desktop\SCLabFiles\Scripts\InsiderRisks_Log.csv"
 $global:nextPhase = 1
 $global:Recovery = $false
 #Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
 
-#--------------------------------------------------------------------
+#-------------------------------------------------------------------------
 # Debug mode
-#--------------------------------------------------------------------
+#-------------------------------------------------------------------------
 $oldDebugPreference = $DebugPreference
 if($debug)
 {
@@ -647,9 +686,9 @@ if(!(Test-Path($logCSV)))
                 Recovery
             }
 
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 # use variable to control phases
-#----------------------------------------------------------------
+#---------------------------------------------------------------------
 if($nextPhase -eq 1)
     {
         write-debug "Phase $nextPhase"
@@ -710,6 +749,6 @@ if($nextPhase -eq 10)
     {
         write-debug "Phase $nextPhase"
         write-host "Configuration completed"
-        logWrite 7 $true "Configuration completed"
+        logWrite 10 $true "Configuration completed"
         exitScript
     }
