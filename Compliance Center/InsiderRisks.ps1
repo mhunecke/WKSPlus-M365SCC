@@ -22,7 +22,7 @@
     ##################################################################################################
 
 .Version
-    4.02 (June 27th, 2023)
+    4.03 (June 27th, 2023)
     Melhorias:
     tirar a virgula do JSON file
     testar se o HR connector já existe ou se se foi sucesso no log para não fazer novamente quando excutar o Badging connector
@@ -44,10 +44,10 @@ function logWrite([int]$phase, [bool]$result, [string]$logstring)
             Add-Content -Path $LogCSV -Value "$phase,$result,$(Get-Date),$logString"
             Write-Host -ForegroundColor Green "$(Get-Date) - Phase $phase : $logstring"
         } 
-    else 
-        {
-            Write-Host -ForegroundColor Red "$(Get-Date) - Phase $phase : $logstring"
-        }
+        else 
+            {
+                Write-Host -ForegroundColor Red "$(Get-Date) - Phase $phase : $logstring"
+            }
 }
 
 #---------------------------------------------------------------------
@@ -85,13 +85,13 @@ function Recovery
                         Write-Debug "nextPhase set to $global:nextPhase"
                     }
         }
-            else
-                {
-                    # set the phase
-                    Write-Host "Phase $lastEntryPhase was successful, so picking up where we left off...."
-                    $global:nextPhase = $lastEntryPhase + 1
-                    write-Debug "nextPhase set to $global:nextPhase"
-                }
+                else
+                    {
+                        # set the phase
+                        Write-Host "Phase $lastEntryPhase was successful, so picking up where we left off...."
+                        $global:nextPhase = $lastEntryPhase + 1
+                        write-Debug "nextPhase set to $global:nextPhase"
+                    }
 }
 
 #---------------------------------------------------------------------
@@ -177,42 +177,42 @@ function ConnectAzureAD
 function ConnectMsol
 {
     try 
-    {
-        Write-Debug "Get-MSOLCompanyInformation -ErrorAction stop"
-        $testConnection = Get-MSOLCompanyInformation -ErrorAction stop | Out-Null #if true (Already Connected)
-    }
-    catch
         {
-            try
-                {
-                    write-Debug $error[0].Exception
-                    Write-Host "Connecting to Microsoft Online..."
-                    Connect-MSOLService -ErrorAction stop | Out-Null
-                }
-                catch    
+            Write-Debug "Get-MSOLCompanyInformation -ErrorAction stop"
+            $testConnection = Get-MSOLCompanyInformation -ErrorAction stop | Out-Null #if true (Already Connected)
+        }
+        catch
+            {
+                try
                     {
-                        try
-                            {
-                                write-Debug $error[0].Exception
-                                Write-Host "Installing Microsoft Online PowerShell Module..."
-                                Install-Module MSOnline -Force -AllowClobber -ErrorAction stop | Out-Null
-                                Connect-MSOLService -ErrorAction stop | Out-Null
-                            }
-                            catch
+                        write-Debug $error[0].Exception
+                        Write-Host "Connecting to Microsoft Online..."
+                        Connect-MSOLService -ErrorAction stop | Out-Null
+                    }
+                    catch    
+                        {
+                            try
                                 {
                                     write-Debug $error[0].Exception
-                                    logWrite 2 $false "Couldn't connect to Microsoft Online. Exiting."
-                                    exitScript
+                                    Write-Host "Installing Microsoft Online PowerShell Module..."
+                                    Install-Module MSOnline -Force -AllowClobber -ErrorAction stop | Out-Null
+                                    Connect-MSOLService -ErrorAction stop | Out-Null
                                 }
-                   
-                    }
-        }
-        if($global:Recovery -eq $false)
-            {
-                logWrite 2 $true "Successfully connected to Microsoft Online."
-                $global:nextPhase++
-                Write-Debug "nextPhase set to $global:nextPhase"
+                                catch
+                                    {
+                                        write-Debug $error[0].Exception
+                                        logWrite 2 $false "Couldn't connect to Microsoft Online. Exiting."
+                                        exitScript
+                                    }
+                    
+                        }
             }
+    if($global:Recovery -eq $false)
+        {
+            logWrite 2 $true "Successfully connected to Microsoft Online."
+            $global:nextPhase++
+            Write-Debug "nextPhase set to $global:nextPhase"
+        }
 }
 
 #######################################################################################
@@ -234,13 +234,12 @@ function DownloadScripts
             Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-physical-badging-connector-sample-scripts/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_badging_records.ps1" -ErrorAction Stop
             $global:Recovery = $false #There no Recover process from here. All the steps below (3, 4, and 5) will be executed.
         } 
-        catch 
-            {
-                write-Debug $error[0].Exception
-                logWrite 3 $false "Unable to download the script from GitHub! Exiting."
-                exitScript
-            }
-
+            catch 
+                {
+                    write-Debug $error[0].Exception
+                    logWrite 3 $false "Unable to download the script from GitHub! Exiting."
+                    exitScript
+                }
     if($global:Recovery -eq $false)
         {
             logWrite 3 $True "Successfully downloaded the script from GitHub."
@@ -273,11 +272,11 @@ function InsiderRisks_CreateCSVFile_HRConnector
                 }
         }
         catch 
-        {
-            write-Debug $error[0].Exception
-            logWrite 4 $false "Error creating the HRConnectorData.csv file."
-            exitScript
-        }
+            {
+                write-Debug $error[0].Exception
+                logWrite 4 $false "Error creating the HRConnectorData.csv file."
+                exitScript
+            }
     if($global:Recovery -eq $false)
         {
             logWrite 4 $True "Successfully created the HRConnectordata.csv file."
@@ -362,11 +361,11 @@ function InsiderRisks_CreateAzureApp_HRConnector
                     }
         }
         catch 
-        {
-            write-Debug $error[0].Exception
-            logWrite 5 $false "Error creating the Azure App for HR Connector. Try again."
-            exitScript
-        }
+            {
+                write-Debug $error[0].Exception
+                logWrite 5 $false "Error creating the Azure App for HR Connector. Try again."
+                exitScript
+            }
     if($global:Recovery -eq $false)
         {
             logWrite 5 $True "Successfully created the Azure App for HR Connector."
@@ -463,10 +462,10 @@ function InsiderRisks_CreateCSVFile_BadgingConnector
                         {
                             $AccessStatus = "Sucess"
                         }
-                    else
-                        {
-                            $AccessStatus = "Failed"
-                        }
+                        else
+                            {
+                                $AccessStatus = "Failed"
+                            }
                     "   {" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
                     "       " + [char]34 + "UserID" + [char]34 + ":" + [char]34 + $EmailAddress + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
                     "       " + [char]34 + "AssetID" + [char]34 + ":" + [char]34 + $AssetID + [char]34 + "," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
@@ -477,33 +476,33 @@ function InsiderRisks_CreateCSVFile_BadgingConnector
                         {
                             "   }" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
                         }
-                    else
-                        {
-                            "   }," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
-                        }
+                        else
+                            {
+                                "   }," | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
+                            }
                 }
                 "]" | out-file $BadgingConnectorCSVFile -Encoding utf8 -Append
         }
         catch 
-        {
-            write-Debug $error[0].Exception
-            logWrite 7 $false "Error creating the BadgingConnectorData.csv file."
-            exitScript
-        }
-        #---------------------------------------------------------------------
-        # InsiderRisks - Create the CSV file for Priority Physical Assests import
-        #---------------------------------------------------------------------
-        "Asset ID" | Out-File $Priority_physical_assets -Encoding utf8
-        "Tokyo_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
-        "Delhi_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
-        "Shanghai_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
-        "SaoPaulo_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
-        "MexicoCity_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
-        "Dhaka_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
-        "Cairo_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
-        "Beijing_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
-        "London_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
-        "Seattle_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+            {
+                write-Debug $error[0].Exception
+                logWrite 7 $false "Error creating the BadgingConnectorData.csv file."
+                exitScript
+            }
+    #---------------------------------------------------------------------
+    # InsiderRisks - Create the CSV file for Priority Physical Assests import
+    #---------------------------------------------------------------------
+    "Asset ID" | Out-File $Priority_physical_assets -Encoding utf8
+    "Tokyo_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+    "Delhi_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+    "Shanghai_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+    "SaoPaulo_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+    "MexicoCity_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+    "Dhaka_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+    "Cairo_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+    "Beijing_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+    "London_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
+    "Seattle_Main_01" | Out-File $Priority_physical_assets -Encoding utf8 -Append
     if($global:Recovery -eq $false)
         {
             logWrite 7 $True "Successfully created the BadgingConnectordata.csv file."
@@ -588,11 +587,11 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                     }
         }
         catch 
-        {
-            write-Debug $error[0].Exception
-            logWrite 8 $false "Error creating the Azure App for Physical Badging Connector. Try again."
-            exitScript
-        }
+            {
+                write-Debug $error[0].Exception
+                logWrite 8 $false "Error creating the Azure App for Physical Badging Connector. Try again."
+                exitScript
+            }
     if($global:Recovery -eq $false)
         {
             logWrite 8 $True "Successfully created the Azure App for Bagde Connector."
@@ -635,11 +634,11 @@ function InsiderRisks_UploadCSV_BadgingConnector
             .\upload_Badging_records.ps1 -tenantId $tenantId -appId $appId -appSecret $Secret -jobId $ConnectorJobID -jsonFilePath $BadgingConnectorCSVFile
         }
         catch 
-        {
-            write-Debug $error[0].Exception
-            logWrite 9 $false "Error uploading the BadgingConnectorData.csv file"
-            exitScript
-        }
+            {
+                write-Debug $error[0].Exception
+                logWrite 9 $false "Error uploading the BadgingConnectorData.csv file"
+                exitScript
+            }
     if($global:Recovery -eq $false)
         {
             logWrite 9 $True "Successfully uploading the BadgingConnectordata.csv file."
