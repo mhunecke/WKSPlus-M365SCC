@@ -23,8 +23,8 @@
 
 .Version
     4.02 (June 10th, 2023)    Improvements:    
-    1) Run the " create CSV"  and " upload CSV" portions only for Connectors    
-    2) Test if the Connector already in both " log and azure", avoid to create a new one. (Similar to the improvment 1)    
+    1) Run the "create CSV" and "upload CSV" portions only for Connectors    
+    2) Test if the Connector already in both "log and azure", avoid to create a new one. (Similar to the improvment #1)    
     3) Error on JoibIDTem file creating.
 #>
 
