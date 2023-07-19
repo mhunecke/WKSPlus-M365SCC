@@ -22,11 +22,10 @@
     ##################################################################################################
 
 .Version
-    4.03 (June 27th, 2023)
-    Melhorias:
-    tirar a virgula do JSON file
-    testar se o HR connector já existe ou se se foi sucesso no log para não fazer novamente quando excutar o Badging connector
-    Tem um erro com o JobID de um dos connectores, ou dos 2.
+    4.02 (June 10th, 2023)    Improvements:    
+    1) Run the " create CSV"  and " upload CSV" portions only for Connectors    
+    2) Test if the Connector already in both " log and azure", avoid to create a new one. (Similar to the improvment 1)    
+    3) Error on JoibIDTem file creating.
 #>
 
 Param (
