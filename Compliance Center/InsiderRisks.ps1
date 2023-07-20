@@ -294,13 +294,14 @@ function InsiderRisks_CreateAzureApp_HRConnector
     try
         {
             $HRapp_appsecret = "$($LogPath)_HRapp_appsecret.txt"
+            $BadgingApp_Name = "HRConnector01"
             $appExists = $null
-            $appExists = Get-AzureADApplication -SearchString "HRConnector01"
+            $appExists = Get-AzureADApplication -SearchString $BadgingApp_Name
             $AzureTenantID = Get-AzureADTenantDetail
             $global:tenantid = $AzureTenantID.ObjectId
             if ($null -eq $appExists)
                 {
-                    $AzureADAppReg = New-AzureADApplication -DisplayName HRConnector -AvailableToOtherTenants $false -ErrorAction Stop
+                    $AzureADAppReg = New-AzureADApplication -DisplayName $BadgingApp_Name -AvailableToOtherTenants $false -ErrorAction Stop
                     $appname = $AzureADAppReg.DisplayName
                     $global:appid = $AzureADAppReg.AppID
                     #$AzureTenantID = Get-AzureADTenantDetail
@@ -348,7 +349,7 @@ function InsiderRisks_CreateAzureApp_HRConnector
                         write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
                         write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
                         write-host "##                                                                                      ##" -ForegroundColor Green            
-                        write-host "##   App name  : $appname                                                            ##" -ForegroundColor Green
+                        write-host "##   App name  : $appname                                                          ##" -ForegroundColor Green
                         write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
                         write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
                         write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
@@ -397,7 +398,7 @@ function InsiderRisks_UploadCSV_HRConnector
             write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
             write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green            
-            write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
+            write-host "##   App ID    : $global:appid                                 ##" -ForegroundColor Green
             write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
             write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
             write-host "##   JobId     : $ConnectorJobID                                   ##" -ForegroundColor Green
@@ -520,13 +521,14 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
     try
         {
             $BadgingApp_appsecret = "$($LogPath)_BadgingApp_appsecret.txt"
+            $BadgingApp_Name = "BadgingConnector01"
             $appExists = $null
-            $appExists = Get-AzureADApplication -SearchString "BadgingConnector01"
+            $appExists = Get-AzureADApplication -SearchString $BadgingApp_Name
             $AzureTenantID = Get-AzureADTenantDetail
             $global:tenantid = $AzureTenantID.ObjectId
             if ($null -eq $appExists)
                 {
-                    $AzureADAppReg = New-AzureADApplication -DisplayName BadgingConnector -AvailableToOtherTenants $false -ErrorAction Stop
+                    $AzureADAppReg = New-AzureADApplication -DisplayName $BadgingApp_Name -AvailableToOtherTenants $false -ErrorAction Stop
                     $appname = $AzureADAppReg.DisplayName
                     $global:appid = $AzureADAppReg.AppID
                     #$AzureTenantID = Get-AzureADTenantDetail
@@ -541,7 +543,7 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                     write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
                     write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
                     write-host "##                                                                                      ##" -ForegroundColor Green            
-                    write-host "##   App name  : $appname                                                       ##" -ForegroundColor Green
+                    write-host "##   App name  : $appname                                                     ##" -ForegroundColor Green
                     write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
                     write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
                     write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
@@ -574,7 +576,7 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                         write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
                         write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
                         write-host "##                                                                                      ##" -ForegroundColor Green            
-                        write-host "##   App name  : $appname                                                       ##" -ForegroundColor Green
+                        write-host "##   App name  : $appname                                                     ##" -ForegroundColor Green
                         write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
                         write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
                         write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
