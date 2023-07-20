@@ -360,7 +360,7 @@ function InsiderRisks_CreateAzureApp_HRConnector
                         Write-host "When requested, press ENTER to continue." -ForegroundColor Yellow
                         write-host
                         logWrite 5 $True "Azure App for HR Connector already exists, so this step was skipped."
-                        $global:$HRapp_JustUploadCSV = $true
+                        $global:HRapp_JustUploadCSV = $true
                     }
         }
         catch 
