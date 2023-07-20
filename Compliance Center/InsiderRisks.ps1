@@ -780,7 +780,6 @@ if($nextPhase -eq 9)
 if($nextPhase -eq 10)
     {
         write-debug "Phase $nextPhase"
-        write-host "Configuration completed"
         logWrite 10 $true "Configuration completed"
         exitScript
     }
