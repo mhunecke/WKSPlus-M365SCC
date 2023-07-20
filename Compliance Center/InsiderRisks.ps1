@@ -5,7 +5,7 @@
     2) WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview
 
 .Description
-  Prepare the required configuration for some Microsoft Premier offerings.
+  Prepare the required configuration for some Microsoft Unified support titles.
 
 .Description
     ##################################################################################################
@@ -226,10 +226,10 @@ function DownloadScripts
 {
     try
         {
-            #Public script for HR Connector
+            #Get the public script for HR Connector from GitHub
             write-Debug "Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile $($LogPath)upload_termination_records.ps1 -ErrorAction Stop"
             Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-compliance-connector-sample-scripts/master/sample_script.ps1 -OutFile "$($LogPath)upload_termination_records.ps1" -ErrorAction Stop
-            #Public script for Physical Badging Connector
+            #Get the public script for Physical Badging Connector from GitHub
             write-Debug "Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-physical-badging-connector-sample-scripts/master/push_physical_badging_records.ps1 -OutFile $($LogPath)upload_badging_records.ps1 -ErrorAction Stop"
             Invoke-WebRequest -Uri https://raw.githubusercontent.com/microsoft/m365-physical-badging-connector-sample-scripts/master/push_physical_badging_records.ps1 -OutFile "$($LogPath)upload_badging_records.ps1" -ErrorAction Stop
             $global:Recovery = $false #There no Recover process from here. All the steps below (3, 4, and 5) will be executed.
@@ -303,8 +303,6 @@ function InsiderRisks_CreateAzureApp_HRConnector
                     $AzureADAppReg = New-AzureADApplication -DisplayName $BadgingApp_Name -AvailableToOtherTenants $false -ErrorAction Stop
                     $appname = $AzureADAppReg.DisplayName
                     $global:appid = $AzureADAppReg.AppID
-                    #$AzureTenantID = Get-AzureADTenantDetail
-                    #$global:tenantid = $AzureTenantID.ObjectId
                     $AzureSecret = New-AzureADApplicationPasswordCredential -CustomKeyIdentifier PrimarySecret -ObjectId $azureADAppReg.ObjectId -EndDate ((Get-Date).AddMonths(6)) -ErrorAction Stop
                     $global:Secret = $AzureSecret.value
                     "Secret" | out-file $HRapp_appsecret -Encoding utf8 -ErrorAction Stop
@@ -681,7 +679,6 @@ $global:nextPhase = 1
 $global:Recovery = $false
 $global:HRapp_JustUploadCSV = $false
 $global:Badgingapp_JustUploadJSON = $false
-#Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
 
 #-------------------------------------------------------------------------
 # Debug mode
@@ -740,7 +737,6 @@ if($nextPhase -eq 5)
         InsiderRisks_CreateAzureApp_HRConnector
         if ($global:HRapp_JustUploadCSV -eq $true)
             {
-                #$global:nextPhase++
                 Write-Debug "nextPhase set to $global:nextPhase"
             }
             else
@@ -767,7 +763,6 @@ if($nextPhase -eq 8)
         InsiderRisks_CreateAzureApp_BadgingConnector
         if ($global:Badgingapp_JustUploadJSON -eq $true)
             {
-                #$global:nextPhase++
                 Write-Debug "nextPhase set to $global:nextPhase"
             }
             else
