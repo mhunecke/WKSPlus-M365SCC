@@ -386,19 +386,18 @@ function InsiderRisks_UploadCSV_HRConnector
         {
             Write-Host
             $HRConnector_JobID = "$($LogPath)_HRConnector_jobID.txt"
+            Write-Debug "JustUploadCSV $global:HRapp_JustUploadCSV"
             if ($global:HRapp_JustUploadCSV -ne $true)
                 {
                     $ConnectorJobID = Read-Host "Paste the Connector job ID"
+                    if ($null -eq $ConnectorJobID)
+                        {
+                            $ConnectorJobID = Read-Host "Paste the Connector job ID"
+                        }
                     "JobID" | out-file $HRConnector_JobID -Encoding utf8 -ErrorAction Stop
                     $ConnectorJobID | out-file $HRConnector_JobID -Encoding utf8 -Append -ErrorAction Stop
                 }
-                if ($null -eq $ConnectorJobID)
-                    {
-                        $ConnectorJobID = Read-Host "Paste the Connector job ID"
-                        "JobID" | out-file $HRConnector_JobID -Encoding utf8 -ErrorAction Stop
-                        $ConnectorJobID | out-file $HRConnector_JobID -Encoding utf8 -Append -ErrorAction Stop
-                    }
-            Write-Host
+                Write-Host
             write-host "##########################################################################################" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green
             write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
