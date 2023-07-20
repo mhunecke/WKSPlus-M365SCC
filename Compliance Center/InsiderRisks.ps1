@@ -397,8 +397,11 @@ function InsiderRisks_UploadCSV_HRConnector
                     "JobID" | out-file $HRConnector_JobID -Encoding utf8 -ErrorAction Stop
                     $ConnectorJobID | out-file $HRConnector_JobID -Encoding utf8 -Append -ErrorAction Stop
                 }
-            $JobIDfile = Import-Csv $HRConnector_JobID -Encoding utf8 -ErrorAction SilentlyContinue
-            $ConnectorJobID = $JobIDfile.JobID
+                else
+                    {
+                        $JobIDfile = Import-Csv $HRConnector_JobID -Encoding utf8 -ErrorAction SilentlyContinue
+                        $ConnectorJobID = $JobIDfile.JobID
+                    }
             Write-Host
             write-host "##########################################################################################" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green
