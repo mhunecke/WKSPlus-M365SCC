@@ -316,7 +316,7 @@ function InsiderRisks_CreateAzureApp_HRConnector
                     write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
                     write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
                     write-host "##                                                                                      ##" -ForegroundColor Green            
-                    write-host "##   App name  : $appname                                                            ##" -ForegroundColor Green
+                    write-host "##   App name  : $appname                                                          ##" -ForegroundColor Green
                     write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
                     write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
                     write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
