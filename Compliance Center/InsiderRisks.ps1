@@ -386,7 +386,7 @@ function InsiderRisks_UploadCSV_HRConnector
         {
             Write-Host
             $HRConnector_JobID = "$($LogPath)_HRConnector_jobID.txt"
-            Write-Debug "JustUploadCSV $global:HRapp_JustUploadCSV"
+            #Write-Debug "JustUploadCSV $global:HRapp_JustUploadCSV"
             if ($global:HRapp_JustUploadCSV -ne $true)
                 {
                     $ConnectorJobID = Read-Host "Paste the Connector job ID"
