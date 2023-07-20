@@ -720,7 +720,7 @@ if($nextPhase -eq 5)
     {
         write-debug "Phase $nextPhase"
         InsiderRisks_CreateAzureApp_HRConnector
-        if ($global:JustUploadCSV -eq $true)
+        if ($JustUploadCSV -eq $true)
             {
                 $global:nextPhase++
                 Write-Debug "nextPhase set to $global:nextPhase"
