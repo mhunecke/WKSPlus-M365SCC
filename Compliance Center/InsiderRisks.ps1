@@ -385,7 +385,6 @@ function InsiderRisks_UploadCSV_HRConnector
     try   
         {
             Write-Host
-            write-host "i'm here" -ForegroundColor Blue
             $HRConnector_JobID = "$($LogPath)_HRConnector_jobID.txt"
             $ConnectorJobID = Read-Host "Paste the Connector job ID"
             if ($null -eq $ConnectorJobID)
@@ -724,7 +723,7 @@ if($nextPhase -eq 5)
         InsiderRisks_CreateAzureApp_HRConnector
         if ($global:HRapp_JustUploadCSV -eq $true)
             {
-                $global:nextPhase++
+                #$global:nextPhase++
                 Write-Debug "nextPhase set to $global:nextPhase"
             }
             else
@@ -751,7 +750,7 @@ if($nextPhase -eq 8)
         InsiderRisks_CreateAzureApp_BadgingConnector
         if ($global:Badgeapp_JustUploadCSV -eq $true)
             {
-                $global:nextPhase++
+                #$global:nextPhase++
                 Write-Debug "nextPhase set to $global:nextPhase"
             }
             else
