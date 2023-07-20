@@ -22,10 +22,12 @@
     ##################################################################################################
 
 .Version
-    4.02 (June 10th, 2023)    Improvements:    
+    2.11 (July 31st, 2023)
+    Owner: Marcelo Hunecke <mhunecke@microsoft.com>
+    Updates: Eli Yang <Eli.Yang@microsoft.com>
+    Improvements:
     1) Run the "create CSV" and "upload CSV" portions only for Connectors    
     2) Test if the Connector already in both "log and azure", avoid to create a new one. (Similar to the improvment #1)    
-    3) Error on JoibIDTem file creating.
 #>
 
 Param (
@@ -293,7 +295,7 @@ function InsiderRisks_CreateAzureApp_HRConnector
         {
             $HRapp_appsecret = "$($LogPath)_HRapp_appsecret.txt"
             $appExists = $null
-            $appExists = Get-AzureADApplication -SearchString "HRConnector"
+            $appExists = Get-AzureADApplication -SearchString "HRConnector01"
             $AzureTenantID = Get-AzureADTenantDetail
             $global:tenantid = $AzureTenantID.ObjectId
             if ($null -eq $appExists)
@@ -381,7 +383,7 @@ function InsiderRisks_UploadCSV_HRConnector
     try   
         {
             Write-Host
-            $HRConnector_JobID = "$($LogPath)_$HRConnector_jobID.txt"
+            $HRConnector_JobID = "$($LogPath)_HRConnector_jobID.txt"
             $ConnectorJobID = Read-Host "Paste the Connector job ID"
             if ($null -eq $ConnectorJobID)
                 {
@@ -399,7 +401,7 @@ function InsiderRisks_UploadCSV_HRConnector
             write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
             write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
             write-host "##   JobId     : $ConnectorJobID                                   ##" -ForegroundColor Green
-            write-host "##   CSV File  : $global:HRConnectorCSVFile        ##" -ForegroundColor Green
+            write-host "##   CSV File  : $global:HRConnectorCSVFile          ##" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green
             write-host "##########################################################################################" -ForegroundColor Green
             Write-Host
@@ -519,7 +521,7 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
         {
             $BadgingApp_appsecret = "$($LogPath)_BadgingApp_appsecret.txt"
             $appExists = $null
-            $appExists = Get-AzureADApplication -SearchString "BadgingConnector"
+            $appExists = Get-AzureADApplication -SearchString "BadgingConnector01"
             $AzureTenantID = Get-AzureADTenantDetail
             $global:tenantid = $AzureTenantID.ObjectId
             if ($null -eq $appExists)
@@ -607,7 +609,7 @@ function InsiderRisks_UploadCSV_BadgingConnector
     try   
         {
             Write-Host
-            $BadgingConnector_JobID = "$($LogPath)_$BadgingConnector_jobID.txt"
+            $BadgingConnector_JobID = "$($LogPath)_BadgingConnector_jobID.txt"
             $ConnectorJobID = Read-Host "Paste the Connector job ID"
             if ($null -eq $ConnectorJobID)
                 {
