@@ -280,7 +280,7 @@ function InsiderRisks_CreateCSVFile_HRConnector
             }
     if($global:Recovery -eq $false)
         {
-            logWrite 4 $True "Successfully created the HRConnectordata.csv file."
+            logWrite 4 $True "Successfully created the HRConnectorData.csv file."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
@@ -385,6 +385,7 @@ function InsiderRisks_UploadCSV_HRConnector
     try   
         {
             Write-Host
+            write-host "i'm here" -ForegroundColor Blue
             $HRConnector_JobID = "$($LogPath)_HRConnector_jobID.txt"
             $ConnectorJobID = Read-Host "Paste the Connector job ID"
             if ($null -eq $ConnectorJobID)
