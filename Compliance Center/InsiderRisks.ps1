@@ -360,7 +360,7 @@ function InsiderRisks_CreateAzureApp_HRConnector
                         Write-host "When requested, press ENTER to continue." -ForegroundColor Yellow
                         write-host
                         logWrite 5 $True "Azure App for HR Connector already exists, so this step was skipped."
-                        $global:JustUploadCSV = $true
+                        $global:$HRapp_JustUploadCSV = $true
                     }
         }
         catch 
@@ -568,7 +568,7 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                                 {
                                     Remove-AzureADApplication -ObjectId $appExists.ObjectId
                                     lastEntryPhase = 2
-                                    logWrite 5 $false "Badging Azure App already exists, but the secret file was not found. Try again."
+                                    logWrite 8 $false "Badging Azure App already exists, but the secret file was not found. Try again."
                                 }
                         $global:Secret = $Secretfile.Secret
                         write-host
@@ -587,7 +587,8 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                         Write-host "Return to the lab instructions" -ForegroundColor Yellow
                         Write-host "When requested, press ENTER to continue." -ForegroundColor Yellow
                         write-host
-                        logWrite 5 $True "Azure App for HR Connector already exists, so this step was skipped."
+                        logWrite 8 $True "Azure App for Badging Connector already exists, so this step was skipped."
+                        $global:Badgeapp_JustUploadCSV = $true
                     }
         }
         catch 
@@ -720,7 +721,7 @@ if($nextPhase -eq 5)
     {
         write-debug "Phase $nextPhase"
         InsiderRisks_CreateAzureApp_HRConnector
-        if ($global:JustUploadCSV -eq $true)
+        if ($global:HRapp_JustUploadCSV -eq $true)
             {
                 $global:nextPhase++
                 Write-Debug "nextPhase set to $global:nextPhase"
@@ -747,7 +748,15 @@ if($nextPhase -eq 8)
     {
         write-debug "Phase $nextPhase"
         InsiderRisks_CreateAzureApp_BadgingConnector
-        $answer = Read-Host "Press ENTER to continue"
+        if ($global:Badgeapp_JustUploadCSV -eq $true)
+            {
+                $global:nextPhase++
+                Write-Debug "nextPhase set to $global:nextPhase"
+            }
+            else
+                {
+                    $answer = Read-Host "Press ENTER to continue"
+                }
     }
 
 if($nextPhase -eq 9)
