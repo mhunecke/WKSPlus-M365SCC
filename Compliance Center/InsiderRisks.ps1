@@ -22,12 +22,11 @@
     ##################################################################################################
 
 .Version
-    2.11 (July 31st, 2023)
-    Owner: Marcelo Hunecke <mhunecke@microsoft.com>
-    Updates: Eli Yang <Eli.Yang@microsoft.com>
-    Improvements:
-    1) Run the "create CSV" and "upload CSV" portions only for Connectors    
-    2) Test if the Connector already in both "log and azure", avoid to create a new one. (Similar to the improvment #1)    
+    2.02 (July 31st, 2023)
+    Owners: 
+        Marcelo Hunecke <mhunecke@microsoft.com>
+        Eli Yang <Eli.Yang@microsoft.com>
+        Ashley Wills <Ashley.Wills@microsoft.com>
 #>
 
 Param (
@@ -662,7 +661,7 @@ function InsiderRisks_UploadCSV_BadgingConnector
             }
     if($global:Recovery -eq $false)
         {
-            logWrite 9 $True "Successfully uploading the BadgingConnectordata.csv file."
+            logWrite 9 $True "Successfully uploading the BadgingConnectorData.csv file."
             $global:nextPhase++
             Write-Debug "nextPhase set to $global:nextPhase"
         }
