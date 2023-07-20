@@ -385,7 +385,7 @@ function InsiderRisks_UploadCSV_HRConnector
         {
             Write-Host
             $HRConnector_JobID = "$($LogPath)_HRConnector_jobID.txt"
-            if ($global:HRapp_JustUploadCSV -ne $true)
+            if ($global:HRapp_JustUploadCSV -eq $false)
                 {
                     $ConnectorJobID = Read-Host "Paste the Connector job ID"
                     if ($null -eq $ConnectorJobID)
@@ -621,7 +621,7 @@ function InsiderRisks_UploadCSV_BadgingConnector
         {
             Write-Host
             $BadgingConnector_JobID = "$($LogPath)_BadgingConnector_jobID.txt"
-            if ($global:Badgingapp_JustUploadJSON -ne $true)
+            if ($global:Badgingapp_JustUploadJSON -eq $false)
             {
                 $ConnectorJobID = Read-Host "Paste the Connector job ID"
                 if ($null -eq $ConnectorJobID)
