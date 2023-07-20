@@ -386,7 +386,6 @@ function InsiderRisks_UploadCSV_HRConnector
         {
             Write-Host
             $HRConnector_JobID = "$($LogPath)_HRConnector_jobID.txt"
-            #Write-Debug "JustUploadCSV $global:HRapp_JustUploadCSV"
             if ($global:HRapp_JustUploadCSV -ne $true)
                 {
                     $ConnectorJobID = Read-Host "Paste the Connector job ID"
@@ -417,7 +416,6 @@ function InsiderRisks_UploadCSV_HRConnector
             write-host "##########################################################################################" -ForegroundColor Green
             Write-Host
             Set-Location -Path "$env:UserProfile\Desktop\SCLabFiles\Scripts"
-            Write-Host "uploadding" -ForegroundColor Blue
             .\upload_termination_records.ps1 -tenantId $tenantId -appId $appId -appSecret $Secret -jobId $ConnectorJobID -FilePath $HRConnectorCSVFile
         }
         catch 
@@ -624,13 +622,21 @@ function InsiderRisks_UploadCSV_BadgingConnector
         {
             Write-Host
             $BadgingConnector_JobID = "$($LogPath)_BadgingConnector_jobID.txt"
-            $ConnectorJobID = Read-Host "Paste the Connector job ID"
-            if ($null -eq $ConnectorJobID)
+            if ($global:HRapp_JustUploadCSV -ne $true)
+            {
+                $ConnectorJobID = Read-Host "Paste the Connector job ID"
+                if ($null -eq $ConnectorJobID)
+                    {
+                        $ConnectorJobID = Read-Host "Paste the Connector job ID"
+                    }
+                "JobID" | out-file $BadgingConnector_JobID -Encoding utf8 -ErrorAction Stop
+                $ConnectorJobID | out-file $BadgingConnector_JobID -Encoding utf8 -Append -ErrorAction Stop
+            }
+            else
                 {
-                    $ConnectorJobID = Read-Host "Paste the Connector job ID"
+                    $JobIDfile = Import-Csv $BadgingConnector_JobID -Encoding utf8 -ErrorAction SilentlyContinue
+                    $ConnectorJobID = $JobIDfile.JobID
                 }
-            "JobID" | out-file $BadgingConnector_JobID -Encoding utf8 -ErrorAction Stop
-            $ConnectorJobID | out-file $BadgingConnector_JobID -Encoding utf8 -Append -ErrorAction Stop
             Write-Host
             write-host "##########################################################################################" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green
