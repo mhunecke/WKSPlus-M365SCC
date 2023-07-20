@@ -595,7 +595,7 @@ function InsiderRisks_CreateAzureApp_BadgingConnector
                         Write-host "When requested, press ENTER to continue." -ForegroundColor Yellow
                         write-host
                         logWrite 8 $True "Azure App for Badging Connector already exists, so this step was skipped."
-                        $global:Badgeapp_JustUploadCSV = $true #This variable will be used to skip the step 8 (Create app) if the app already exists.
+                        $global:Badgingapp_JustUploadJSON = $true #This variable will be used to skip the step 8 (Create app) if the app already exists.
                     }
         }
         catch 
@@ -621,7 +621,7 @@ function InsiderRisks_UploadCSV_BadgingConnector
         {
             Write-Host
             $BadgingConnector_JobID = "$($LogPath)_BadgingConnector_jobID.txt"
-            if ($global:HRapp_JustUploadCSV -ne $true)
+            if ($global:Badgingapp_JustUploadJSON -ne $true)
             {
                 $ConnectorJobID = Read-Host "Paste the Connector job ID"
                 if ($null -eq $ConnectorJobID)
@@ -679,6 +679,8 @@ $LogPath = "$env:UserProfile\Desktop\SCLabFiles\Scripts\"
 $LogCSV = "$env:UserProfile\Desktop\SCLabFiles\Scripts\InsiderRisks_Log.csv"
 $global:nextPhase = 1
 $global:Recovery = $false
+$global:HRapp_JustUploadCSV = $false
+$global:Badgingapp_JustUploadJSON = $false
 #Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Force
 
 #-------------------------------------------------------------------------
@@ -763,7 +765,7 @@ if($nextPhase -eq 8)
     {
         write-debug "Phase $nextPhase"
         InsiderRisks_CreateAzureApp_BadgingConnector
-        if ($global:Badgeapp_JustUploadCSV -eq $true)
+        if ($global:Badgingapp_JustUploadJSON -eq $true)
             {
                 #$global:nextPhase++
                 Write-Debug "nextPhase set to $global:nextPhase"
