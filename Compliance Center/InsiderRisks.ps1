@@ -360,6 +360,7 @@ function InsiderRisks_CreateAzureApp_HRConnector
                         Write-host "When requested, press ENTER to continue." -ForegroundColor Yellow
                         write-host
                         logWrite 5 $True "Azure App for HR Connector already exists, so this step was skipped."
+                        $global:JustUploadCSV = $true
                     }
         }
         catch 
@@ -398,7 +399,7 @@ function InsiderRisks_UploadCSV_HRConnector
             write-host "##     WorkshopPLUS: Microsoft 365 Security and Compliance - Microsoft Purview  and     ##" -ForegroundColor Green
             write-host "##     Activate Microsoft 365 Security and Compliance: Purview Manage Insider Risks     ##" -ForegroundColor Green
             write-host "##                                                                                      ##" -ForegroundColor Green            
-            write-host "##   App ID    : $global:appid                                 ##" -ForegroundColor Green
+            write-host "##   App ID    : $global:appid                                   ##" -ForegroundColor Green
             write-host "##   Tenant ID : $global:tenantid                                   ##" -ForegroundColor Green
             write-host "##   App Secret: $global:secret                           ##" -ForegroundColor Green
             write-host "##   JobId     : $ConnectorJobID                                   ##" -ForegroundColor Green
@@ -719,7 +720,15 @@ if($nextPhase -eq 5)
     {
         write-debug "Phase $nextPhase"
         InsiderRisks_CreateAzureApp_HRConnector
-        $answer = Read-Host "Press ENTER to continue"
+        if ($global:JustUploadCSV -eq $true)
+            {
+                $global:nextPhase++
+                Write-Debug "nextPhase set to $global:nextPhase"
+            }
+            else
+                {
+                    $answer = Read-Host "Press ENTER to continue"
+                }
     }
 
 if($nextPhase -eq 6)
