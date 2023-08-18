@@ -22,7 +22,7 @@
     ##################################################################################################
 
 .Version
-    2.02 (July 31st, 2023)
+    4.0 (August 21st, 2023)
     Owners: 
         Marcelo Hunecke <mhunecke@microsoft.com>
         Eli Yang <Eli.Yang@microsoft.com>
@@ -143,7 +143,7 @@ function ConnectAzureAD
                     {
                         write-Debug $error[0].Exception
                         Write-Host "Connecting to Azure AD..."
-                        Connect-AzureAD -ErrorAction stop | Out-Null
+                        Connect-AzureAD -WarningAction SilentlyContinue -ErrorAction stop | Out-Null
                     }
                     catch    
                         {
@@ -152,7 +152,7 @@ function ConnectAzureAD
                                     write-Debug $error[0].Exception
                                     Write-Host "Installing Azure AD PowerShell Module..."
                                     Install-Module AzureAD -Force -AllowClobber
-                                    Connect-AzureAD -ErrorAction stop | Out-Null
+                                    Connect-AzureAD -WarningAction SilentlyContinue -ErrorAction stop | Out-Null
                                 }
                                 catch
                                     {
